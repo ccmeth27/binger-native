@@ -1,9 +1,9 @@
 import React from 'react'
-import { Text, SafeAreaView, StyleSheet, Platform, Image } from 'react-native'
+import { SafeAreaView, StyleSheet, Platform } from 'react-native'
 import Swiper from 'react-native-deck-swiper'
-// import { Card } from '../components/Card'
 import { Tile } from 'react-native-elements'
 import Layout from '../constants/Layout'
+// import FastImage from 'react-native-fast-image'
 
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
 
@@ -35,6 +35,7 @@ class HomeScreen extends React.Component {
       console.log(movie)
       return (
         <Tile
+          key={movie.id}
           imageSrc={{ uri: movie.poster_120x171}}
           imageContainerStyle={styles.imageContainer}
           activeOpacity={0.9}
@@ -45,10 +46,21 @@ class HomeScreen extends React.Component {
           containerStyle={styles.tileContainer}
           featured
         />
-         
       )
-    
   }
+
+  swipeLeft = (cardIndex) => {
+    console.log("Rejected", this.state.movies[cardIndex])
+  }
+
+  swipeRight = (cardIndex) => {
+    console.log("Added to Watchlist", this.state.movies[cardIndex])
+  }
+
+  moreInfo = (cardIndex) => {
+    console.log('More Info', this.state.movies[cardIndex])
+  }
+  
 
   render() {
     
@@ -59,13 +71,59 @@ class HomeScreen extends React.Component {
           ref={swiper => {
             this.swiper = swiper;
           }}
+          key={movie.id}
+          style={styles.tileContainer}
           useViewOverFlow={false}
           cards={this.state.movies}
           renderCard={(movie) => this.renderMovies(movie)}
-          // infinite 
+          showSecondCard={false}
+          onSwipedLeft={(movie) => this.swipeLeft(movie)}
+          onSwipedRight={(movie) => this.swipeRight(movie)}
+          onTapCard={this.moreInfo}
+          onTapCardDeadZone={10}
           backgroundColor="white"
           cardHorizontalMargin={0}
-          stackSize={2} // number of cards shown in background
+          stackSize={2}
+          overlayLabels={{
+            left: {
+              title: 'NOPE',
+              style: {
+                label: {
+                  backgroundColor: 'black',
+                  borderColor: 'black',
+                  color: 'white',
+                  borderWidth: 1
+                },
+                wrapper: {
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  justifyContent: 'flex-start',
+                  marginTop: 20,
+                  marginRight: 40
+                }
+              }
+            },
+            right: {
+              title: 'ADDED',
+              style: {
+                label: {
+                  backgroundColor: 'black',
+                  borderColor: 'black',
+                  color: 'white',
+                  borderWidth: 1
+                },
+                wrapper: {
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+                  marginTop: 20,
+                  marginLeft: -60
+                }
+              }
+            }
+          }}
+          animateOverlayLabelsOpacity
+          animateCardOpacity 
         />
         )}
       </SafeAreaView>
@@ -78,17 +136,18 @@ export default HomeScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
   },
   tileContainer: {
     flex: 1,
     alignItems: 'center',
+    borderRadius: 25,
   },
   imageContainer: {
-    width: Layout.window.width - 30,
-    height: Layout.window.height - BOTTOM_BAR_HEIGHT * 6,
-    borderRadius: 20,
-    overflow: 'hidden', // this does magic
+    width: Layout.window.width - 40,
+    height: Layout.window.height - BOTTOM_BAR_HEIGHT * 7,
+    borderRadius: 25,
+    overflow: 'hidden',
   },
   title: {
     position: 'absolute',
