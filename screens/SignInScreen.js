@@ -35,13 +35,13 @@ export default class SignInScreen extends React.Component {
             alert(data.errors)
           }
         else { 
-            this.props.navigation.setParams({
-                user: data.user,
-                token: data.token,
-            });
-            this.props.navigation.navigate('Main', {
-              user: data.user,
-              token: data.token,
+            this.props.navigation.navigate({ 
+                routeName: 'Home', 
+                params: {
+                    token: data.token,
+                    user_id: data.user.id,
+                    username: data.user.username,
+                }
             });
         }
     })

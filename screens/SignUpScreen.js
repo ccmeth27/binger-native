@@ -35,15 +35,14 @@ export default class SignUpScreen extends React.Component {
             alert(response.errors)
           } 
           else {
-            console.log(response)
-            this.props.navigation.setParams({
-              user: response.user,
-              token: response.token
-            })
-            this.props.navigation.navigate('Main', {
-              user: response.user,
-              token: response.token
-            })
+            this.props.navigation.navigate({ 
+              routeName: 'Home', 
+              params: {
+                  token: response.token,
+                  user_id: response.user.id,
+                  username: response.user.username,
+              }
+          });
           }
         })
         .catch((error) => {

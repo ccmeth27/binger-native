@@ -10,7 +10,9 @@ const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49
 class HomeScreen extends React.Component {
   
   state = {
-    movies: []
+    movies: [],
+    user_id: null,
+    token: null
   }
   
   
@@ -31,8 +33,13 @@ class HomeScreen extends React.Component {
         });
   }
 
+  setUser = () => {
+    console.log('user ID:',this.props.navigation.state.params.user_id)
+    
+  }
+
   renderMovies = (movie) => {
-      console.log(movie)
+      // console.log(movie)
       return (
         <Tile
           key={movie.id}
@@ -50,20 +57,110 @@ class HomeScreen extends React.Component {
   }
 
   swipeLeft = (cardIndex) => {
-    console.log("Rejected", this.state.movies[cardIndex])
+    let movieData = this.state.movies[cardIndex]
+    let userID = this.props.navigation.state.params.user_id
+    fetch('http://localhost:3001/api/v1/user_programs', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: userID,
+        guidebox_id: movieData.id,
+        is_seen: 0,
+        is_rejected: 1,
+        is_watchlist: 0,
+        title: movieData.title,
+        poster: movieData.poster_120x171,
+        release_year: movieData.release_year,
+        imdb: movieData.imdb,
+        rottentomatoes: movieData.rottentomatoes
+      })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        console.log(data)
+    })
+    .catch((error) => {
+      console.log(error);
+    })
   }
 
   swipeRight = (cardIndex) => {
-    console.log("Added to Watchlist", this.state.movies[cardIndex])
+    let movieData = this.state.movies[cardIndex]
+    let userID = this.props.navigation.state.params.user_id
+    fetch('http://localhost:3001/api/v1/user_programs', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: userID,
+        guidebox_id: movieData.id,
+        is_seen: 0,
+        is_rejected: 0,
+        is_watchlist: 1,
+        title: movieData.title,
+        poster: movieData.poster_120x171,
+        release_year: movieData.release_year,
+        imdb: movieData.imdb,
+        rottentomatoes: movieData.rottentomatoes
+      })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        console.log(data)
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+  }
+
+  swipeUp = (cardIndex) => {
+    let movieData = this.state.movies[cardIndex]
+    let userID = this.props.navigation.state.params.user_id
+    fetch('http://localhost:3001/api/v1/user_programs', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: userID,
+        guidebox_id: movieData.id,
+        is_seen: 1,
+        is_rejected: 0,
+        is_watchlist: 0,
+        title: movieData.title,
+        poster: movieData.poster_120x171,
+        release_year: movieData.release_year,
+        imdb: movieData.imdb,
+        rottentomatoes: movieData.rottentomatoes
+      })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        console.log(data)
+    })
+    .catch((error) => {
+      console.log(error);
+    })
   }
 
   moreInfo = (cardIndex) => {
-    console.log('More Info', this.state.movies[cardIndex])
+    let imdbID = this.state.movies[cardIndex].imdb
+    fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
+    .then(resp => resp.json())
+    .then(response => {
+          console.log(response)
+    })
   }
   
 
   render() {
-    
+    this.setUser()
     return (
       <SafeAreaView style={styles.container} >
         {this.state.movies.map(movie =>
@@ -77,9 +174,10 @@ class HomeScreen extends React.Component {
           cards={this.state.movies}
           renderCard={(movie) => this.renderMovies(movie)}
           showSecondCard={false}
-          onSwipedLeft={(movie) => this.swipeLeft(movie)}
-          onSwipedRight={(movie) => this.swipeRight(movie)}
-          onTapCard={this.moreInfo}
+          onSwipedLeft={(cardIndex) => this.swipeLeft(cardIndex)}
+          onSwipedRight={(cardIndex) => this.swipeRight(cardIndex)}
+          onSwipeUp={(cardIndex) => this.swipeUp(cardIndex)}
+          onTapCard={(cardIndex) => this.moreInfo(cardIndex)}
           onTapCardDeadZone={10}
           backgroundColor="white"
           cardHorizontalMargin={0}
@@ -132,7 +230,7 @@ class HomeScreen extends React.Component {
 }
 
 export default HomeScreen
-
+const omdb_api = '6743b2b0'
 const styles = StyleSheet.create({
   container: {
     flex: 1,
