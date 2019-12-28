@@ -1,8 +1,10 @@
 import React from 'react'
-import { SafeAreaView, StyleSheet, Platform } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Platform, Text, Image, View } from 'react-native'
 import Swiper from 'react-native-deck-swiper'
-import { Tile } from 'react-native-elements'
+import { Tile, Divider } from 'react-native-elements'
 import Layout from '../constants/Layout'
+import { AnimatedModal } from "react-native-modal-animated"
+import { NavigationActions } from 'react-navigation';
 // import FastImage from 'react-native-fast-image'
 
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
@@ -12,16 +14,29 @@ class HomeScreen extends React.Component {
   state = {
     movies: [],
     user_id: null,
-    token: null
+    token: null,
+    modalVisible: false,
+    programInfo: {},
+    moreInfoPoster: '../assets/images/what.gif',
+    imdbRating: 'N/A',
+    tomatoesRating: 'N/A',
   }
   
   
   componentDidMount() {
+    let userID = this.props.navigation.state.params.user_id
     this.fetchMovies()
+    // this.props.navigation.setParams({ user_id: userID })
+    console.log(userID)
+    const setParamsAction = NavigationActions.setParams({
+      params: { user_id: userID },
+      key: 'Watchlist',
+    });
+    this.props.navigation.dispatch(setParamsAction);
   }
 
   fetchMovies() {
-      fetch(`http://api-public.guidebox.com/v2/movies?api_key=ecdec86bafadac43c038330199eec79294c468d8`)
+      fetch(`http://api-public.guidebox.com/v2/movies?api_key=beeb2b0cc73bdf55f4ac9f1d8e9f595f9aaa14b6`)
       .then(resp => resp.json())
       .then(movieData => {
           this.setState({
@@ -34,8 +49,8 @@ class HomeScreen extends React.Component {
   }
 
   setUser = () => {
-    console.log('user ID:',this.props.navigation.state.params.user_id)
-    
+    // let userID = this.props.navigation.state.params.user_id
+    this.props.navigation.setParams({ user_id: this.props.navigation.state.params.user_id })
   }
 
   renderMovies = (movie) => {
@@ -55,6 +70,8 @@ class HomeScreen extends React.Component {
         />
       )
   }
+
+  
 
   swipeLeft = (cardIndex) => {
     let movieData = this.state.movies[cardIndex]
@@ -149,20 +166,72 @@ class HomeScreen extends React.Component {
     })
   }
 
-  moreInfo = (cardIndex) => {
+  getMoreInfo = (cardIndex) => {
     let imdbID = this.state.movies[cardIndex].imdb
     fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
     .then(resp => resp.json())
-    .then(response => {
-          console.log(response)
+    .then(programData => {
+          this.renderMoreInfo(programData)
     })
+  }
+
+  renderMoreInfo = (programData) => {
+    console.log(programData)
+    this.setState({
+      modalVisible: true,
+      programInfo: programData,
+      moreInfoPoster: programData.Poster,
+      imdbRating: programData.Ratings[0].Value, 
+      tomatoesRating: programData.Ratings[1].Value, 
+    })
+    
   }
   
 
   render() {
-    this.setUser()
+    this.setUser
     return (
       <SafeAreaView style={styles.container} >
+        
+
+        
+        <AnimatedModal
+          visible={this.state.modalVisible}
+          onBackdropPress={() => {
+            this.setState({ modalVisible: false });
+          }}
+          animationType="slide"
+          duration={600}
+         >
+          <ScrollView 
+            contentContainer={styles.scrollView}
+            alwaysBounceVertical
+            >
+            <View style={styles.modalCard}>
+              <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
+              <Divider style={styles.divider}/>
+              <Tile 
+                imageSrc={{uri: this.state.moreInfoPoster}} 
+                imageContainerStyle={styles.posterContainer}
+                />
+              <View style={styles.ratingsContainer}>
+                <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
+                <Text style={styles.modalText}> {this.state.imdbRating} </Text>
+                <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
+                <Text style={styles.modalText}> {this.state.tomatoesRating} </Text>
+              </View>
+              <View style={styles.programCredits}>
+                <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
+                <Text style={styles.modalText}> Release Date: {this.state.programInfo.Released}</Text>
+                <Text style={styles.modalText}> Plot: {this.state.programInfo.Plot}</Text>
+                <Text style={styles.modalText}> Cast: {this.state.programInfo.Actors}</Text>
+                <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
+                <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
+              </View>
+            </View>
+          </ScrollView>
+        </AnimatedModal>
+        
         {this.state.movies.map(movie =>
         <Swiper
           ref={swiper => {
@@ -177,7 +246,7 @@ class HomeScreen extends React.Component {
           onSwipedLeft={(cardIndex) => this.swipeLeft(cardIndex)}
           onSwipedRight={(cardIndex) => this.swipeRight(cardIndex)}
           onSwipeUp={(cardIndex) => this.swipeUp(cardIndex)}
-          onTapCard={(cardIndex) => this.moreInfo(cardIndex)}
+          onTapCard={(cardIndex) => this.getMoreInfo(cardIndex)}
           onTapCardDeadZone={10}
           backgroundColor="white"
           cardHorizontalMargin={0}
@@ -230,6 +299,7 @@ class HomeScreen extends React.Component {
 }
 
 export default HomeScreen
+
 const omdb_api = '6743b2b0'
 const styles = StyleSheet.create({
   container: {
@@ -257,4 +327,52 @@ const styles = StyleSheet.create({
     left: 10,
     bottom: 10,
   },
+  scrollView: {
+
+  },
+  modalCard: {
+    flex: 1,
+    width: Layout.window.width,
+    height: Layout.window.height - BOTTOM_BAR_HEIGHT, 
+    top: 90,
+    backgroundColor: 'black',
+    alignItems: 'center',
+  },
+  posterContainer: {
+    marginTop: 10,
+    alignSelf: 'center',
+    height: 225,
+    width: 200,
+    borderRadius: 20,
+    
+  },
+  modalText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginHorizontal: 20,
+  },
+  titleText: {
+    color: 'white',
+    fontWeight: 'bold',
+    paddingTop: 20,
+    alignSelf: 'center',
+    fontSize: 30,
+    marginHorizontal: 20,
+  },
+  divider: {
+    marginHorizontal: 20,
+    marginVertical: 10,
+  },
+  ratingsContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+  },
+  ratingsLogos: {
+    marginBottom: 10,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    height: 30,
+    width: 30,
+  }
 })
