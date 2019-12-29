@@ -4,7 +4,7 @@ import Swiper from 'react-native-deck-swiper'
 import { Tile, Divider } from 'react-native-elements'
 import Layout from '../constants/Layout'
 import { AnimatedModal } from "react-native-modal-animated"
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions, NavigationEvents } from 'react-navigation';
 // import FastImage from 'react-native-fast-image'
 
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
@@ -25,14 +25,11 @@ class HomeScreen extends React.Component {
   
   componentDidMount() {
     let userID = this.props.navigation.state.params.user_id
+    let username = this.props.navigation.state.params.username
     this.fetchMovies()
-    // this.props.navigation.setParams({ user_id: userID })
-    console.log(userID)
-    const setParamsAction = NavigationActions.setParams({
-      params: { user_id: userID },
-      key: 'Watchlist',
-    });
-    this.props.navigation.dispatch(setParamsAction);
+    
+    // console.log(userID)
+    this.setUser(userID, username)
   }
 
   fetchMovies() {
@@ -48,9 +45,23 @@ class HomeScreen extends React.Component {
         });
   }
 
-  setUser = () => {
-    // let userID = this.props.navigation.state.params.user_id
-    this.props.navigation.setParams({ user_id: this.props.navigation.state.params.user_id })
+  setUser = (userID, username) => {
+    const setWatchlistParams = NavigationActions.setParams({
+      params: { 
+        user_id: userID,
+        username: username 
+      },
+      key: 'Watchlist'
+    });
+    const setProfileParams = NavigationActions.setParams({
+      params: { 
+        user_id: userID,
+        username: username  },
+      key: 'Profile'
+    });
+    this.props.navigation.dispatch(setWatchlistParams);
+    this.props.navigation.dispatch(setProfileParams);
+    
   }
 
   renderMovies = (movie) => {
@@ -189,12 +200,9 @@ class HomeScreen extends React.Component {
   
 
   render() {
-    this.setUser
+    console.log(this.props.navigation)
     return (
       <SafeAreaView style={styles.container} >
-        
-
-        
         <AnimatedModal
           visible={this.state.modalVisible}
           onBackdropPress={() => {

@@ -8,21 +8,21 @@ import HomeScreen from '../screens/HomeScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
-const config = Platform.select({
-  web: { headerMode: 'screen' },
-  default: {},
-});
+// const config = Platform.select({
+//   web: { headerMode: 'screen' },
+//   default: {},
+// });
 
-const HomeStack = createStackNavigator(
-  {
-    Home: HomeScreen,
-  },
-  {
-    headerMode: 'none',
-  },
-);
+// const HomeStack = createStackNavigator(
+//   {
+//     Home: HomeScreen,
+//   },
+//   {
+//     headerMode: 'none',
+//   },
+// );
 
-HomeStack.navigationOptions = {
+HomeScreen.navigationOptions = {
   tabBarLabel: 'Home',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
@@ -36,36 +36,39 @@ HomeStack.navigationOptions = {
   ),
 };
 
-HomeStack.path = '';
+HomeScreen.path = '';
 
-const WatchlistStack = createStackNavigator(
-  {
-    Watchlist: WatchlistScreen,
-  },
-  {
-    headerMode: 'none',
-  },
-);
+// const WatchlistStack = createStackNavigator(
+//   {
+//     Watchlist: WatchlistScreen,
+//   },
+//   {
+//     headerMode: 'none',
+//   },
+// );
 
-WatchlistStack.navigationOptions = {
+WatchlistScreen.navigationOptions = {
   tabBarLabel: 'Watchlist',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+    <TabBarIcon 
+    focused={focused} 
+    name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} 
+    />
   ),
 };
 
-WatchlistStack.path = '';
+WatchlistScreen.path = '';
 
-const ProfileStack = createStackNavigator(
-  {
-    Profile: ProfileScreen,
-  },
-  {
-    headerMode: 'none',
-  },
-);
+// const ProfileStack = createStackNavigator(
+//   {
+//     Profile: ProfileScreen,
+//   },
+//   {
+//     headerMode: 'none',
+//   },
+// );
 
-ProfileStack.navigationOptions = {
+ProfileScreen.navigationOptions = {
   tabBarLabel: 'Profile',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon 
@@ -74,13 +77,32 @@ ProfileStack.navigationOptions = {
   ),
 };
 
-ProfileStack.path = '';
+ProfileScreen.path = '';
 
 const tabNavigator = createBottomTabNavigator({
-  HomeStack,
-  WatchlistStack,
-  ProfileStack,
-});
+    Home: {
+      screen: HomeScreen,
+      navigationOptions: {
+        title: 'Discover'
+      }
+    },
+    Watchlist: {
+      screen: WatchlistScreen,
+      navigationOptions: {
+        title: 'My Wishlist'
+      }
+    },
+    Profile: {
+      screen: ProfileScreen,
+      navigationOptions: {
+        title: 'username',
+        
+      }
+    },
+    },{
+      headerMode: 'none',
+    },
+);
 
 tabNavigator.path = '';
 
