@@ -27,8 +27,6 @@ class HomeScreen extends React.Component {
     let userID = this.props.navigation.state.params.user_id
     let username = this.props.navigation.state.params.username
     this.fetchMovies()
-    
-    // console.log(userID)
     this.setUser(userID, username)
   }
 
@@ -59,8 +57,15 @@ class HomeScreen extends React.Component {
         username: username  },
       key: 'Profile'
     });
+    const setSearchParams = NavigationActions.setParams({
+      params: { 
+        user_id: userID,
+        username: username  },
+      key: 'Search'
+    });
     this.props.navigation.dispatch(setWatchlistParams);
     this.props.navigation.dispatch(setProfileParams);
+    this.props.navigation.dispatch(setSearchParams);
     
   }
 
@@ -256,7 +261,8 @@ class HomeScreen extends React.Component {
           onSwipeUp={(cardIndex) => this.swipeUp(cardIndex)}
           onTapCard={(cardIndex) => this.getMoreInfo(cardIndex)}
           onTapCardDeadZone={10}
-          backgroundColor="white"
+          backgroundColor="#151515"
+          borderRadius={25}
           cardHorizontalMargin={0}
           stackSize={2}
           overlayLabels={{
@@ -312,7 +318,7 @@ const omdb_api = '6743b2b0'
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#151515',
   },
   tileContainer: {
     flex: 1,

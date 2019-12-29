@@ -40,20 +40,21 @@ class InputField extends Component {
   }
   const styles = StyleSheet.create({
     wrapper: {
-      display: "flex"
+      display: "flex",
+      justifyContent: 'center'
     },
     label: { 
         fontWeight: "700", 
         marginTop: 10,
         marginBottom: 5,
-        marginLeft: 10, 
+        marginLeft: 30, 
     },
     input: {
       borderBottomWidth: 1,
       paddingTop: 5,
       marginBottom: 5,
-      marginLeft: 10,
-      marginRight: 10,
+      marginLeft: 30,
+      marginRight: 30,
     }
   });
   export default InputField;

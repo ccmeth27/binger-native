@@ -56,7 +56,8 @@ export default class SignUpScreen extends React.Component {
 
     render() {
       return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.container}>
+          <Text style={styles.registerHeader}>Sign Up</Text>
           <InputField 
             name="username" 
             labelText="USERNAME" 
@@ -102,12 +103,17 @@ export default class SignUpScreen extends React.Component {
       marginHorizontal: 20,
       marginVertical: 20,
     },
+    container: {
+      marginTop: 100,
+      
+    },
     registerHeader: {
       fontSize: 28,
-      color: 'white',
-      fontWeight: "300",
+      color: 'black',
+      fontWeight: "bold",
       marginBottom: 50,
-      top: 60
+      top: 20,
+      alignSelf: 'center'
     },
     submitButton: {
       paddingTop: 20,

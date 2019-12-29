@@ -7,20 +7,12 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import WatchlistScreen from '../screens/WatchlistScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import SearchScreen from '../screens/SearchScreen';
 
 // const config = Platform.select({
 //   web: { headerMode: 'screen' },
 //   default: {},
 // });
-
-// const HomeStack = createStackNavigator(
-//   {
-//     Home: HomeScreen,
-//   },
-//   {
-//     headerMode: 'none',
-//   },
-// );
 
 HomeScreen.navigationOptions = {
   tabBarLabel: 'Home',
@@ -29,8 +21,8 @@ HomeScreen.navigationOptions = {
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
+          ? `ios-home${focused ? '' : '-outline'}`
+          : 'md-home'
       }
     />
   ),
@@ -38,46 +30,40 @@ HomeScreen.navigationOptions = {
 
 HomeScreen.path = '';
 
-// const WatchlistStack = createStackNavigator(
-//   {
-//     Watchlist: WatchlistScreen,
-//   },
-//   {
-//     headerMode: 'none',
-//   },
-// );
-
 WatchlistScreen.navigationOptions = {
   tabBarLabel: 'Watchlist',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon 
     focused={focused} 
-    name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} 
+    name={Platform.OS === 'ios' ? 'ios-bookmark' : 'md-bookmark'} 
     />
   ),
 };
 
 WatchlistScreen.path = '';
 
-// const ProfileStack = createStackNavigator(
-//   {
-//     Profile: ProfileScreen,
-//   },
-//   {
-//     headerMode: 'none',
-//   },
-// );
 
 ProfileScreen.navigationOptions = {
   tabBarLabel: 'Profile',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon 
     focused={focused} 
-    name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
+    name={Platform.OS === 'ios' ? 'ios-contact' : 'md-contact'} />
   ),
 };
 
 ProfileScreen.path = '';
+
+SearchScreen.navigationOptions = {
+  tabBarLabel: 'Search',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon 
+    focused={focused} 
+    name={Platform.OS === 'ios' ? 'ios-search' : 'md-search'} />
+  ),
+};
+
+SearchScreen.path = '';
 
 const tabNavigator = createBottomTabNavigator({
     Home: {
@@ -92,15 +78,25 @@ const tabNavigator = createBottomTabNavigator({
         title: 'My Wishlist'
       }
     },
+    Search: {
+      screen: SearchScreen,
+      navigationOptions: {
+        title: 'Search',
+      }
+    },
     Profile: {
       screen: ProfileScreen,
       navigationOptions: {
         title: 'username',
-        
       }
     },
-    },{
+  },{
       headerMode: 'none',
+      tabBarOptions: {
+        style: {
+          backgroundColor:'#272727'
+        }
+      }
     },
 );
 

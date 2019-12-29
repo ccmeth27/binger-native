@@ -1,5 +1,5 @@
 import React from 'react'
-import { SafeAreaView, Button, StyleSheet, TouchableOpacity } from 'react-native'
+import { SafeAreaView, Button, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import InputField from '../components/InputField'
 
 
@@ -52,7 +52,8 @@ export default class SignInScreen extends React.Component {
 
   render() {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loginHeader}>Log In</Text>
         <InputField 
             name="username" 
             labelText="USERNAME" 
@@ -91,6 +92,18 @@ const styles = StyleSheet.create({
       width: 150,
       alignSelf: 'center',
       justifyContent: 'center'
+      
+    },
+    loginHeader: {
+      fontSize: 28,
+      color: 'black',
+      fontWeight: "bold",
+      marginBottom: 50,
+      top: 20,
+      alignSelf: 'center'
+    },
+    container: {
+      marginTop: 100,
       
     }
   });

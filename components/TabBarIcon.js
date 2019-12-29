@@ -1,5 +1,6 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import Icon from '@expo/vector-icons/FontAwesome';
 
 import Colors from '../constants/Colors';
 

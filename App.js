@@ -36,13 +36,10 @@ export default class App extends React.Component {
         require('./assets/images/splash.png'),
         require('./assets/images/icon.png'),
       ]),
-      Font.loadAsync({
-        // This is the font we're using for our tab bar
-        ...Icon.MaterialIcons.font,
-        ...Icon.MaterialCommunityIcons.font,
-        ...Icon.FontAwesome.font,
-        ...Icon.Feather.font,
-      }),
+      // Font.loadAsync({
+      //   // This is the font we're using for our tab bar
+      //   
+      // }),
     ])
   }
 
@@ -60,6 +57,6 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#151515',
   },
 })
