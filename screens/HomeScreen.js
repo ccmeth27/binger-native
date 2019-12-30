@@ -23,7 +23,8 @@ class HomeScreen extends React.Component {
     imdbRating: 'N/A',
     tomatoesRating: 'N/A',
     switch1Value: false,
-    programType: 'movie',
+    programType: 'movies',
+    is_movie: 1,
   }
   
   
@@ -35,7 +36,8 @@ class HomeScreen extends React.Component {
   }
 
   fetchMovies() {
-      fetch(`http://api-public.guidebox.com/v2/movies?api_key=beeb2b0cc73bdf55f4ac9f1d8e9f595f9aaa14b6`)
+    let type = this.state.programType
+      fetch(`http://api-public.guidebox.com/v2/${type}?api_key=beeb2b0cc73bdf55f4ac9f1d8e9f595f9aaa14b6`)
       .then(resp => resp.json())
       .then(movieData => {
           this.setState({
@@ -75,10 +77,12 @@ class HomeScreen extends React.Component {
   }
 
   renderMovies = (movie) => {
+    console.log(movie)
+    if(this.state.programType === 'movies') {
       return (
         <Tile
           key={movie.id}
-          imageSrc={{ uri: movie.poster_120x171}}
+          imageSrc={{ uri: movie.poster_400x570}}
           imageContainerStyle={styles.imageContainer}
           activeOpacity={0.9}
           title={movie.title}
@@ -89,26 +93,49 @@ class HomeScreen extends React.Component {
           featured
         />
       )
+    } else {
+      return (
+        <Tile
+          key={movie.id}
+          imageSrc={{ uri: movie.artwork_304x171}}
+          imageContainerStyle={styles.imageContainer}
+          activeOpacity={0.9}
+          title={movie.title}
+          titleStyle={styles.title}
+          caption={'First Aired:' + "" + movie.first_aired}
+          captionStyle={styles.caption}
+          containerStyle={styles.tileContainer}
+          featured
+        />
+      )
+    }
   }
 
   toggleSwitch1 = (value) => {
     console.log('Switch is: ' + value)
     switch (value) {
-        case true:
-            this.setState({
-                programType: 'series',
-                switch1Value: value,
-            })
-            break;
-        case false:
-            this.setState({
-                programType: 'movie',
-                switch1Value: value,
-            })
-            break;
-        default:
-            break;
-    }
+      case true:
+          this.setState({
+              programType: 'shows',
+              switch1Value: value,
+              loading: true,
+              is_movie: 0,
+              },
+              this.fetchMovies
+          )
+          break;
+      case false:
+          this.setState({
+              programType: 'movies',
+              switch1Value: value,
+              loading: true,
+              is_movie: 1,
+              },
+              this.fetchMovies
+          )
+          break;
+  }
+    
     
 }
 
@@ -117,6 +144,18 @@ class HomeScreen extends React.Component {
   swipeLeft = (cardIndex) => {
     let movieData = this.state.movies[cardIndex]
     let userID = this.props.navigation.state.params.user_id
+    let poster;
+    let released;
+    let imdbID;
+    if(this.state.is_movie === 0){
+      poster = movieData.artwork_304x171
+      imdbID = movieData.imdb_id
+      released = movieData.first_aired
+    }else{
+      poster = movieData.poster_400x570
+      imdbID = movieData.imdb
+      released = movieData.release_year
+    }
     fetch('http://localhost:3001/api/v1/user_programs', {
       method: 'POST',
       headers: {
@@ -130,10 +169,10 @@ class HomeScreen extends React.Component {
         is_rejected: 1,
         is_watchlist: 0,
         title: movieData.title,
-        poster: movieData.poster_120x171,
-        release_year: movieData.release_year,
-        imdb: movieData.imdb,
-        rottentomatoes: movieData.rottentomatoes
+        poster: poster,
+        release_year: released,
+        imdb: imdbID,
+        is_movie: this.state.is_movie,
       })
     })
     .then(resp => resp.json())
@@ -148,6 +187,18 @@ class HomeScreen extends React.Component {
   swipeRight = (cardIndex) => {
     let movieData = this.state.movies[cardIndex]
     let userID = this.props.navigation.state.params.user_id
+    let poster;
+    let released;
+    let imdbID;
+    if(this.state.is_movie === 0){
+      poster = movieData.artwork_304x171
+      imdbID = movieData.imdb_id
+      released = movieData.first_aired
+    }else{
+      poster = movieData.poster_400x570
+      imdbID = movieData.imdb
+      released = movieData.release_year
+    }
     fetch('http://localhost:3001/api/v1/user_programs', {
       method: 'POST',
       headers: {
@@ -161,10 +212,10 @@ class HomeScreen extends React.Component {
         is_rejected: 0,
         is_watchlist: 1,
         title: movieData.title,
-        poster: movieData.poster_120x171,
-        release_year: movieData.release_year,
-        imdb: movieData.imdb,
-        rottentomatoes: movieData.rottentomatoes
+        poster: poster,
+        release_year: released,
+        imdb: imdbID,
+        is_movie: this.state.is_movie,
       })
     })
     .then(resp => resp.json())
@@ -179,6 +230,18 @@ class HomeScreen extends React.Component {
   swipeUp = (cardIndex) => {
     let movieData = this.state.movies[cardIndex]
     let userID = this.props.navigation.state.params.user_id
+    let poster;
+    let released;
+    let imdbID;
+    if(this.state.is_movie === 0){
+      poster = movieData.artwork_304x171
+      imdbID = movieData.imdb_id
+      released = movieData.first_aired
+    }else{
+      poster = movieData.poster_400x570
+      imdbID = movieData.imdb
+      released = movieData.release_year
+    }
     fetch('http://localhost:3001/api/v1/user_programs', {
       method: 'POST',
       headers: {
@@ -192,10 +255,10 @@ class HomeScreen extends React.Component {
         is_rejected: 0,
         is_watchlist: 0,
         title: movieData.title,
-        poster: movieData.poster_120x171,
-        release_year: movieData.release_year,
-        imdb: movieData.imdb,
-        rottentomatoes: movieData.rottentomatoes
+        poster: poster,
+        release_year: released,
+        imdb: imdbID,
+        is_movie: this.state.is_movie
       })
     })
     .then(resp => resp.json())

@@ -27,8 +27,8 @@ class SearchScreen extends React.Component {
         loading: false,
         searchResults: [],
         page: 1,
-        switch1Value: false,
         programType: 'movie',
+        switch1Value: false,
         modalVisible: false,
         programInfo: [],
         moreInfoPoster: '../assets/images/what.gif',
@@ -45,54 +45,60 @@ class SearchScreen extends React.Component {
     };
 
     getSearchResults = () => {
-        let input = this.state.search
+        console.log(this.state.switch1Value)
+        console.log(this.state.programType)
         let type = this.state.programType
+        let input = this.state.search
         let page = this.state.page
         fetch(`http://www.omdbapi.com/?s=${input}&type=${type}&apikey=6743b2b0`)
         .then(resp => resp.json())
         .then(results => {
             console.log(results.Search)
             this.setState({
+                searchResults: results.Search,
                 loading: false,
-                searchResults: results.Search
             })
 
         })
     }
 
     toggleSwitch1 = (value) => {
-        console.log('Switch is: ' + value)
+        console.log('Switch is: ', value)
         switch (value) {
             case true:
                 this.setState({
                     programType: 'series',
                     switch1Value: value,
-                })
+                    loading: true,
+                    tomatoesRating: 'N/A',
+                    },
+                    this.getSearchResults
+                )
                 break;
             case false:
                 this.setState({
                     programType: 'movie',
                     switch1Value: value,
-                })
-                break;
-            default:
+                    loading: true
+                    },
+                    this.getSearchResults
+                )
                 break;
         }
-        
     }
-
 
     getMoreInfo = (item) => {
         let imdb = item.imdbID
         fetch(`http://www.omdbapi.com/?i=${imdb}&apikey=6743b2b0`)
         .then(resp => resp.json())
         .then(programData => {
+            console.log(programData)
             this.setState({
                 modalVisible: true,
                 programInfo: programData,
                 moreInfoPoster: programData.Poster,
                 imdbRating: programData.Ratings[0].Value, 
-                tomatoesRating: programData.Ratings[1].Value, 
+                // tomatoesRating: programData.Ratings[1].Value, 
           })
         })
     } 
@@ -101,17 +107,17 @@ class SearchScreen extends React.Component {
             <View>
                 <SearchCard item={item}/>
                 <Button
-                            type="clear"
-                            style={styles.infoButton}
-                            onPress={() => this.getMoreInfo(item)}
-                            icon={
-                            <Icon
-                                name="info"
-                                size={60}
-                                color="white"
-                                />
-                                }
-                                />
+                    type="clear"
+                    style={styles.infoButton}
+                    onPress={() => this.getMoreInfo(item)}
+                    icon={
+                    <Icon
+                        name="info"
+                        size={60}
+                        color="white"
+                        />
+                        }
+                        />
             </View>
         )
     }
@@ -124,8 +130,8 @@ class SearchScreen extends React.Component {
             <View style={styles.switchContainer}>
                 <Text style={styles.toggleText} >Movies</Text>
                 <ToggleSwitch
-                    toggleSwitch1 = {this.toggleSwitch1}
-                    switch1Value = {this.state.switch1Value}/>
+                    toggleSwitch1={this.toggleSwitch1}
+                    switch1Value={this.state.switch1Value}/>
                 <Text style={styles.toggleText} >Shows</Text>
             </View>
             <View>

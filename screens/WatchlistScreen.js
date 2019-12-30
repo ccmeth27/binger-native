@@ -1,74 +1,121 @@
 import React from 'react'
-import { Text, SafeAreaView, Image, View, StyleSheet, ScrollView } from 'react-native'
-import { withNavigation } from 'react-navigation';
-import { Card, ListItem, Button, Icon } from 'react-native-elements'
+import { 
+  ActivityIndicator, 
+  FlatList, 
+  Text, 
+  SafeAreaView, 
+  Image, 
+  View, 
+  StyleSheet
+} from 'react-native'
+import ToggleSwitch from '../components/ToggleSwitch'
+import Layout from '../constants/Layout'
+import { Tile } from 'react-native-elements'
 
 class WatchlistScreen extends React.Component {
   
   state = {
     allUserPrograms: [],
-    isLoading: true,
+    loading: true,
+    programType: 'movie',
+    switch1Value: false,
+    modalVisible: false,
+    programInfo: [],
+    moreInfoPoster: '../assets/images/what.gif',
+    imdbRating: 'N/A',
+    tomatoesRating: 'N/A'
   }
   componentDidMount = () => {
-    this.fetchWatchlist()
+    this.fetchUserWatchlist()
   }
   
-  fetchWatchlist = () => {
+  fetchUserWatchlist = () => {
     const userID = this.props.navigation.state.params.user_id
-    fetch(`http://localhost:3001/api/v1/user_programs/${userID}`)
+    let type = this.state.programType
+    fetch(`http://localhost:3001/api/v1/${type}_watchlist/${userID}`)
     .then(resp => resp.json())
     .then(userPrograms => {
-      // this.renderPrograms(userPrograms)
+      console.log(userPrograms.user_programs)
       this.setState({
-        allUserPrograms: userPrograms,
-        isLoading: false
+        allUserPrograms: userPrograms.user_programs,
+        loading: false
       })
     })
     
   }
 
-  // renderPrograms = () => {
-  //   this.state.allUserPrograms.filter(program => program.is_watchlist === '1').map(program => {
-  //     return (
-  //       <Card title="CARD WITH DIVIDER">
-  //             <View>
-  //               <Image
-  //                 style={styles.image}
-  //                 resizeMode="cover"
-  //                 source={{ uri: program.Poster }}
-  //               />
-  //               <Text style={styles.title}>{program.Title}</Text>
-  //             </View>
-  //       </Card>
-  //       )
-  //   })
-  // }
+  toggleSwitch1 = (value) => {
+    console.log('Switch is: ', value)
+    switch (value) {
+        case true:
+            this.setState({
+                programType: 'series',
+                switch1Value: value,
+                loading: true,
+                // tomatoesRating: 'N/A',
+                },
+                this.fetchUserWatchlist
+            )
+            break;
+        case false:
+            this.setState({
+                programType: 'movie',
+                switch1Value: value,
+                loading: true
+                },
+                this.fetchUserWatchlist
+            )
+            break;
+    }
+}
+
+  renderItem = (item) => {
+    console.log(item)
+    return (
+        <Tile
+          key={item.id}
+          onPress={({item}) => console.log(item)}
+          iconContainerStyle={styles.icon}
+          imageSrc={{ uri: item.poster}}
+          imageContainerStyle={styles.posterImage}
+          activeOpacity={0.9}
+          caption={item.title}
+          captionStyle={styles.caption}
+          containerStyle={styles.tileContainer}
+          contentContainerStyle={{width: 200}}
+          overlayContainerStyle={styles.overlay}
+          featured
+          /> 
+    )
+  }
 
   render() {
     
       return (
-        <SafeAreaView>
-          <ScrollView>
-          <Text>Watchlist Screen</Text>
-          {this.state.isLoading ?
-          <View>
-            <Text>Loading...</Text>
-          </View>
-          :
-          this.state.allUserPrograms.map(program => 
-            <Card title="CARD WITH DIVIDER">
-              <View>
-                <Image
-                  style={styles.image}
-                  resizeMode="cover"
-                  source={{ uri: program.Poster }}
-                />
-                <Text style={styles.title}>{program.Title}</Text>
-              </View>
-            </Card>
+        <SafeAreaView style={{ flex: 1}}>
+            <Text style={styles.header}>Watchlist</Text>
+            <View style={styles.switchContainer}>
+                <Text style={styles.toggleText} >Movies</Text>
+                <ToggleSwitch
+                    toggleSwitch1={this.toggleSwitch1}
+                    switch1Value={this.state.switch1Value}/>
+                <Text style={styles.toggleText} >Shows</Text>
+            </View>
+            {this.state.loading ?
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0000ff"/>
+            </View>
+            :
+            <View style={styles.flatlistContainer}>
+              <FlatList
+                  data={this.state.allUserPrograms}
+                  renderItem={({ item }) => this.renderItem(item)}
+                  keyExtractor={item => item.id}
+                  numColumns={2}
+              />
+            </View>
+            }
           
-          )}
-          </ScrollView>
         </SafeAreaView>
       )
   }
@@ -77,11 +124,46 @@ class WatchlistScreen extends React.Component {
 export default WatchlistScreen
 
 const styles = StyleSheet.create({
-  imageCard: {
-    height: 50,
-    width: 35,
+  header: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'white',
+    alignSelf: 'center',
   },
-  title: {
-    fontWeight: 'bold'
-  }
+  loadingContainer: {
+    flex: 2,
+    justifyContent: 'center'
+  },
+  posterImage: {
+    width: 175,
+    height: 250,
+  },
+  tileContainer: {
+    width: 175,
+    height: 285,
+    margin: 10,
+    marginBottom: 5
+  },
+  flatlistContainer: {
+    alignItems: 'center',
+    marginBottom: 100,
+  },
+  caption: {
+    justifyContent: 'flex-start',
+    color: 'white',
+    fontSize: 12,
+    top: 130,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignContent: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  toggleText: {
+    color: 'white',
+    padding: 5,
+    fontSize: 16,
+},
 })

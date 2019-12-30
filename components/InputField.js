@@ -26,6 +26,7 @@ class InputField extends Component {
             onChange={this.props.onChange}
             onEndEditing={this.props.onEndEditing}
             autoCorrect={false}
+            autoCapitalize={false}
             style={[
               { color: inputColor, 
                 borderBottomColor: borderBottom 
