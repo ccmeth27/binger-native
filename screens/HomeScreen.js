@@ -5,6 +5,7 @@ import { Tile, Divider } from 'react-native-elements'
 import Layout from '../constants/Layout'
 import { AnimatedModal } from "react-native-modal-animated"
 import { NavigationActions } from 'react-navigation';
+import ToggleSwitch from '../components/ToggleSwitch'
 // import FastImage from 'react-native-fast-image'
 
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
@@ -21,6 +22,8 @@ class HomeScreen extends React.Component {
     moreInfoPoster: '../assets/images/what.gif',
     imdbRating: 'N/A',
     tomatoesRating: 'N/A',
+    switch1Value: false,
+    programType: 'movie',
   }
   
   
@@ -36,7 +39,8 @@ class HomeScreen extends React.Component {
       .then(resp => resp.json())
       .then(movieData => {
           this.setState({
-          movies: movieData.results
+          movies: movieData.results,
+          loading: false
           })
       })
       .catch((error) => {
@@ -71,7 +75,6 @@ class HomeScreen extends React.Component {
   }
 
   renderMovies = (movie) => {
-      // console.log(movie)
       return (
         <Tile
           key={movie.id}
@@ -88,7 +91,28 @@ class HomeScreen extends React.Component {
       )
   }
 
-  
+  toggleSwitch1 = (value) => {
+    console.log('Switch is: ' + value)
+    switch (value) {
+        case true:
+            this.setState({
+                programType: 'series',
+                switch1Value: value,
+            })
+            break;
+        case false:
+            this.setState({
+                programType: 'movie',
+                switch1Value: value,
+            })
+            break;
+        default:
+            break;
+    }
+    
+}
+
+  //GESTURE ACTIONS
 
   swipeLeft = (cardIndex) => {
     let movieData = this.state.movies[cardIndex]
@@ -198,15 +222,12 @@ class HomeScreen extends React.Component {
       })
     })
   }
+
+  //END GESTURE ACTIONS
   
   render() {
     return (
       <SafeAreaView style={styles.container} >
-        {this.state.loading ?
-        <View style={styles.loadingIndicator}>
-          <ActivityIndicator size="large" color="#0000ff"/>
-        </View>
-        :
         <AnimatedModal
           visible={this.state.modalVisible}
           onBackdropPress={() => {
@@ -214,9 +235,8 @@ class HomeScreen extends React.Component {
           }}
           animationType="slide"
           duration={600}
-         >
+          >
           <ScrollView 
-            contentContainer={styles.scrollView}
             alwaysBounceVertical
             >
             <View style={styles.modalCard}>
@@ -243,69 +263,85 @@ class HomeScreen extends React.Component {
             </View>
           </ScrollView>
         </AnimatedModal>
+        <View>
+          <View style={styles.switchContainer}>
+              <Text style={styles.toggleText} >Movies</Text>
+              <ToggleSwitch
+                  toggleSwitch1 = {this.toggleSwitch1}
+                  switch1Value = {this.state.switch1Value}/>
+              <Text style={styles.toggleText} >Shows</Text>
+          </View>
+        </View>
+        {this.state.loading ?
+        <View style={styles.loadingIndicator}>
+          <ActivityIndicator size="large" color="#0000ff"/>
+        </View>
+        :
+        <View>
+          {this.state.movies.map(movie =>
+          <Swiper
+            ref={swiper => {
+              this.swiper = swiper;
+            }}
+            key={movie.id}
+            style={styles.tileContainer}
+            useViewOverFlow={false}
+            cards={this.state.movies}
+            renderCard={(movie) => this.renderMovies(movie)}
+            showSecondCard={false}
+            onSwipedLeft={(cardIndex) => this.swipeLeft(cardIndex)}
+            onSwipedRight={(cardIndex) => this.swipeRight(cardIndex)}
+            onSwipeUp={(cardIndex) => this.swipeUp(cardIndex)}
+            onTapCard={(cardIndex) => this.getMoreInfo(cardIndex)}
+            onTapCardDeadZone={10}
+            backgroundColor="#151515"
+            borderRadius={25}
+            cardHorizontalMargin={0}
+            stackSize={2}
+            overlayLabels={{
+              left: {
+                title: 'NOPE',
+                style: {
+                  label: {
+                    backgroundColor: 'black',
+                    borderColor: 'black',
+                    color: 'white',
+                    borderWidth: 1
+                  },
+                  wrapper: {
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                    justifyContent: 'flex-start',
+                    marginTop: 20,
+                    marginRight: 40
+                  }
+                }
+              },
+              right: {
+                title: 'ADDED',
+                style: {
+                  label: {
+                    backgroundColor: 'black',
+                    borderColor: 'black',
+                    color: 'white',
+                    borderWidth: 1
+                  },
+                  wrapper: {
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-start',
+                    marginTop: 20,
+                    marginLeft: -60
+                  }
+                }
+              }
+            }}
+            animateOverlayLabelsOpacity
+            animateCardOpacity 
+          />
+          )}
+        </View>
         }
-        {this.state.movies.map(movie =>
-        <Swiper
-          ref={swiper => {
-            this.swiper = swiper;
-          }}
-          key={movie.id}
-          style={styles.tileContainer}
-          useViewOverFlow={false}
-          cards={this.state.movies}
-          renderCard={(movie) => this.renderMovies(movie)}
-          showSecondCard={false}
-          onSwipedLeft={(cardIndex) => this.swipeLeft(cardIndex)}
-          onSwipedRight={(cardIndex) => this.swipeRight(cardIndex)}
-          onSwipeUp={(cardIndex) => this.swipeUp(cardIndex)}
-          onTapCard={(cardIndex) => this.getMoreInfo(cardIndex)}
-          onTapCardDeadZone={10}
-          backgroundColor="#151515"
-          borderRadius={25}
-          cardHorizontalMargin={0}
-          stackSize={2}
-          overlayLabels={{
-            left: {
-              title: 'NOPE',
-              style: {
-                label: {
-                  backgroundColor: 'black',
-                  borderColor: 'black',
-                  color: 'white',
-                  borderWidth: 1
-                },
-                wrapper: {
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  justifyContent: 'flex-start',
-                  marginTop: 20,
-                  marginRight: 40
-                }
-              }
-            },
-            right: {
-              title: 'ADDED',
-              style: {
-                label: {
-                  backgroundColor: 'black',
-                  borderColor: 'black',
-                  color: 'white',
-                  borderWidth: 1
-                },
-                wrapper: {
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-start',
-                  marginTop: 20,
-                  marginLeft: -60
-                }
-              }
-            }
-          }}
-          animateOverlayLabelsOpacity
-          animateCardOpacity 
-        />
-        )}
       </SafeAreaView>
     )
   }
@@ -320,13 +356,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#151515',
   },
   tileContainer: {
-    flex: 1,
     alignItems: 'center',
     borderRadius: 25,
+    paddingTop: 10,
+    bottom: 40,
   },
   imageContainer: {
     width: Layout.window.width - 40,
-    height: Layout.window.height - BOTTOM_BAR_HEIGHT * 7,
+    height: Layout.window.height - 300,
     borderRadius: 25,
     overflow: 'hidden',
   },
@@ -340,8 +377,18 @@ const styles = StyleSheet.create({
     left: 10,
     bottom: 10,
   },
-  scrollView: {
-
+  switchContainer: {
+    position: 'relative',
+    flexDirection: 'row',
+    alignContent: 'center',
+    justifyContent: 'center',
+    marginTop: 25,
+    paddingBottom: 10,
+  },
+  toggleText: {
+      color: 'white',
+      padding: 5,
+      fontSize: 16,
   },
   modalCard: {
     flex: 1,

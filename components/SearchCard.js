@@ -19,18 +19,7 @@ export default function SearchCard (props) {
                       resizeMode="cover"
                       source={{ uri: props.item.Poster }}
                     />
-                    <Button
-                        type="clear"
-                        style={styles.infoButton}
-                        onPress={() => console.log('pressing', props.item)}
-                        icon={
-                        <Icon
-                            name="info"
-                            size={60}
-                            color="white"
-                            />
-                            }
-                            />
+                    
 
                 </View>
         
@@ -65,15 +54,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignContent: 'center'
     },
-    infoButton: {
-        height: 75,
-        width: 75,
-        backgroundColor: 'purple',
-        borderRadius: 45,
-        bottom: 45,
-        alignSelf: 'flex-end'
-
-    }
+    
     
     
 })

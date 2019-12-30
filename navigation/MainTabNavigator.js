@@ -20,9 +20,7 @@ HomeScreen.navigationOptions = {
     <TabBarIcon
       focused={focused}
       name={
-        Platform.OS === 'ios'
-          ? `ios-home${focused ? '' : '-outline'}`
-          : 'md-home'
+        Platform.OS === 'ios' ? 'ios-home' : 'md-home'
       }
     />
   ),
@@ -94,7 +92,7 @@ const tabNavigator = createBottomTabNavigator({
       headerMode: 'none',
       tabBarOptions: {
         style: {
-          backgroundColor:'#3E434B'
+          backgroundColor:'#272727'
         }
       }
     },

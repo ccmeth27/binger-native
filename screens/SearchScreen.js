@@ -1,10 +1,24 @@
 import React from 'react'
-import { ActivityIndicator, TouchableOpacity, Text, SafeAreaView, StyleSheet, View, Switch, FlatList } from 'react-native'
-import { SearchBar } from 'react-native-elements';
+import { 
+    ActivityIndicator, 
+    ScrollView, 
+    Platform, 
+    Text, 
+    SafeAreaView, 
+    StyleSheet, 
+    View,  
+    FlatList,
+    Image, 
+    } from 'react-native'
+import { SearchBar, Button } from 'react-native-elements';
 import SearchCard from '../components/SearchCard'
 import ToggleSwitch from '../components/ToggleSwitch'
 import Layout from '../constants/Layout'
-import MoreInfoModal from '../components/MoreInfoModal'
+// import MoreInfoModal from '../components/MoreInfoModal'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import { AnimatedModal } from "react-native-modal-animated"
+import { Tile } from 'react-native-elements'
+const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49
 
 class SearchScreen extends React.Component {
   
@@ -16,7 +30,7 @@ class SearchScreen extends React.Component {
         switch1Value: false,
         programType: 'movie',
         modalVisible: false,
-        programInfo: {},
+        programInfo: [],
         moreInfoPoster: '../assets/images/what.gif',
         imdbRating: 'N/A',
         tomatoesRating: 'N/A'
@@ -52,13 +66,13 @@ class SearchScreen extends React.Component {
             case true:
                 this.setState({
                     programType: 'series',
-                    switch1Value: value
+                    switch1Value: value,
                 })
                 break;
             case false:
                 this.setState({
                     programType: 'movie',
-                    switch1Value: value
+                    switch1Value: value,
                 })
                 break;
             default:
@@ -68,9 +82,9 @@ class SearchScreen extends React.Component {
     }
 
 
-    getMoreInfo = (cardIndex) => {
-        let imdbID = this.state.movies[cardIndex].imdb
-        fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
+    getMoreInfo = (item) => {
+        let imdb = item.imdbID
+        fetch(`http://www.omdbapi.com/?i=${imdb}&apikey=6743b2b0`)
         .then(resp => resp.json())
         .then(programData => {
             this.setState({
@@ -81,7 +95,28 @@ class SearchScreen extends React.Component {
                 tomatoesRating: programData.Ratings[1].Value, 
           })
         })
+    } 
+    renderItem = (item) => {
+        return(
+            <View>
+                <SearchCard item={item}/>
+                <Button
+                            type="clear"
+                            style={styles.infoButton}
+                            onPress={() => this.getMoreInfo(item)}
+                            icon={
+                            <Icon
+                                name="info"
+                                size={60}
+                                color="white"
+                                />
+                                }
+                                />
+            </View>
+        )
     }
+
+    
 
     render () {
         return (
@@ -110,16 +145,41 @@ class SearchScreen extends React.Component {
                 />
             </View>
             <Text style={styles.results}>Results:</Text>
-            <View>
-                <MoreInfoModal
-                        visible={this.state.modalVisible}
-                        onBackdropPress={() => {
-                            this.setState({ modalVisible: false });
-                        }}
-                        programInfo={this.state.programInfo}
-                        
-                    />
-            </View>
+            <AnimatedModal
+                visible={this.state.modalVisible}
+                onBackdropPress={() => {
+                  this.setState({ modalVisible: false });
+                }}
+                animationType="slide"
+                duration={600}
+            >
+                <ScrollView 
+                    contentContainer={styles.scrollView}
+                    alwaysBounceVertical
+                >
+                    <View style={styles.modalCard}>
+                        <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
+                        <Tile 
+                          imageSrc={{uri: this.state.moreInfoPoster}} 
+                          imageContainerStyle={styles.posterContainer}
+                          />
+                        <View style={styles.ratingsContainer}>
+                            <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
+                            <Text style={styles.modalText}> {this.state.imdbRating} </Text>
+                            <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
+                            <Text style={styles.modalText}> {this.state.tomatoesRating} </Text>
+                        </View>
+                        <View style={styles.programCredits}>
+                            <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
+                            <Text style={styles.modalText}> Release Date: {this.state.programInfo.Released}</Text>
+                            <Text style={styles.modalText}> Plot: {this.state.programInfo.Plot}</Text>
+                            <Text style={styles.modalText}> Cast: {this.state.programInfo.Actors}</Text>
+                            <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
+                            <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
+                        </View>
+                    </View>
+          </ScrollView>
+        </AnimatedModal>
             {this.state.loading ?
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff"/>
@@ -128,7 +188,7 @@ class SearchScreen extends React.Component {
             <View>
                 <FlatList
                     data={this.state.searchResults}
-                    renderItem={({ item }) => <SearchCard item={item} />}
+                    renderItem={({item}) => this.renderItem(item)}
                     keyExtractor={item => item.Poster}
                     horizontal={true}
                     
@@ -181,14 +241,79 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 20,
         marginBottom: 10,
-
-
     },
     toggleText: {
         color: 'white',
         padding: 5,
         fontSize: 16,
-    }
+    },
+    infoButton: {
+        height: 75,
+        width: 75,
+        backgroundColor: 'purple',
+        borderRadius: 45,
+        bottom: 45,
+        alignSelf: 'flex-end'
+
+    },
+    modalCard: {
+        flex: 1,
+        width: Layout.window.width,
+        height: Layout.window.height - BOTTOM_BAR_HEIGHT, 
+        top: 90,
+        backgroundColor: 'black',
+        alignItems: 'center',
+      },
+      posterContainer: {
+        marginTop: 10,
+        alignSelf: 'center',
+        height: 225,
+        width: 200,
+        borderRadius: 20,
+        
+      },
+      modalText: {
+        color: 'white',
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginHorizontal: 20,
+      },
+      titleText: {
+        color: 'white',
+        fontWeight: 'bold',
+        paddingTop: 20,
+        alignSelf: 'center',
+        fontSize: 30,
+        marginHorizontal: 20,
+      },
+      divider: {
+        marginHorizontal: 20,
+        marginVertical: 10,
+      },
+      ratingsContainer: {
+        flexDirection: 'row',
+        alignSelf: 'center',
+      },
+      ratingsLogos: {
+        marginBottom: 10,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        height: 30,
+        width: 30,
+      },
     
     
 })
+
+{/* <View>
+    <MoreInfoModal
+        visible={this.state.modalVisible}
+        onBackdropPress={() => {
+            this.setState({ modalVisible: false });
+        }}
+        programInfo={this.state.programInfo}
+        imdbRating={this.state.imdbRating}
+        tomatoesRating={this.state.tomatoesRating}
+        moreInfoPoster={this.moreInfoPoster}            
+    />
+</View> */}
