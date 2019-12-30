@@ -1,5 +1,5 @@
 import React from 'react'
-import { SafeAreaView, ScrollView, StyleSheet, Platform, Text, Image, View } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Platform, Text, Image, View, ActivityIndicator } from 'react-native'
 import Swiper from 'react-native-deck-swiper'
 import { Tile, Divider } from 'react-native-elements'
 import Layout from '../constants/Layout'
@@ -13,6 +13,7 @@ class HomeScreen extends React.Component {
   
   state = {
     movies: [],
+    loading: true,
     user_id: null,
     token: null,
     modalVisible: false,
@@ -208,6 +209,11 @@ class HomeScreen extends React.Component {
     console.log(this.props.navigation)
     return (
       <SafeAreaView style={styles.container} >
+        {this.state.loading ?
+        <View style={styles.loadingIndicator}>
+          <ActivityIndicator size="large" color="#0000ff"/>
+        </View>
+        :
         <AnimatedModal
           visible={this.state.modalVisible}
           onBackdropPress={() => {
@@ -244,7 +250,7 @@ class HomeScreen extends React.Component {
             </View>
           </ScrollView>
         </AnimatedModal>
-        
+        }
         {this.state.movies.map(movie =>
         <Swiper
           ref={swiper => {
@@ -388,5 +394,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 30,
     width: 30,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center'
+
   }
 })

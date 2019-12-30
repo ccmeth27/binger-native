@@ -94,7 +94,7 @@ const tabNavigator = createBottomTabNavigator({
       headerMode: 'none',
       tabBarOptions: {
         style: {
-          backgroundColor:'#272727'
+          backgroundColor:'#3E434B'
         }
       }
     },
