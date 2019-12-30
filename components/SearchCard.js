@@ -1,35 +1,51 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { StyleSheet, Text, Image, View, Platform } from 'react-native'
-import { Card } from 'react-native-elements'
+import { Card, Button } from 'react-native-elements'
 import Layout from '../constants/Layout'
+import Icon from 'react-native-vector-icons/FontAwesome'
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
 export default function SearchCard (props) {
-    const { item } = props.item
-    return (
+// export default class SearchCard extends React.Component {
+    // render(){
         
-            // <Card>
+    
+        return (
                 <View style={styles.cardView}>
+                    <View style={styles.textContainer}>
+                        <Text style={styles.cardTitle}> {props.item.Title} - {props.item.Year}</Text>
+                    </View>
                     <Image
                       style={styles.cardImage}
                       resizeMode="cover"
                       source={{ uri: props.item.Poster }}
                     />
-                    <View style={styles.textContainer}>
-                    <Text style={styles.cardTitle}> {props.item.Title} - {props.item.Year}</Text>
+                    <Button
+                        type="clear"
+                        style={styles.infoButton}
+                        onPress={() => console.log('pressing', props.item)}
+                        icon={
+                        <Icon
+                            name="info"
+                            size={60}
+                            color="white"
+                            />
+                            }
+                            />
 
-                    </View>
                 </View>
-            // </Card>
+        
+            
 
-    );
+        );
+    // }
 }
 
 const styles = StyleSheet.create({
     cardView: {
         borderColor: 'black',
         backgroundColor: 'transparent',
-        marginHorizontal: 5,
-        marginTop: 10,
+        marginHorizontal: 10,
+        marginTop: 15,
         
     },
     cardImage: {
@@ -38,18 +54,26 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     cardTitle: {
-        fontSize: 16,
+        fontSize: 20,
         color: 'white',
         alignSelf: 'center',
         
-       
     },
     textContainer: {
-        flex: 1,
         flexWrap: 'wrap',
         flexShrink: 1,
-        alignItems: 'center',
         justifyContent: 'center',
+        alignContent: 'center'
+    },
+    infoButton: {
+        height: 75,
+        width: 75,
+        backgroundColor: 'purple',
+        borderRadius: 45,
+        bottom: 45,
+        alignSelf: 'flex-end'
+
     }
+    
     
 })

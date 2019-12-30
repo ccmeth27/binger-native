@@ -4,7 +4,7 @@ import Swiper from 'react-native-deck-swiper'
 import { Tile, Divider } from 'react-native-elements'
 import Layout from '../constants/Layout'
 import { AnimatedModal } from "react-native-modal-animated"
-import { NavigationActions, NavigationEvents } from 'react-navigation';
+import { NavigationActions } from 'react-navigation';
 // import FastImage from 'react-native-fast-image'
 
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
@@ -188,25 +188,18 @@ class HomeScreen extends React.Component {
     fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
     .then(resp => resp.json())
     .then(programData => {
-          this.renderMoreInfo(programData)
+      this.setState({
+        loading: false,
+        modalVisible: true,
+        programInfo: programData,
+        moreInfoPoster: programData.Poster,
+        imdbRating: programData.Ratings[0].Value, 
+        tomatoesRating: programData.Ratings[1].Value, 
+      })
     })
-  }
-
-  renderMoreInfo = (programData) => {
-    console.log(programData)
-    this.setState({
-      modalVisible: true,
-      programInfo: programData,
-      moreInfoPoster: programData.Poster,
-      imdbRating: programData.Ratings[0].Value, 
-      tomatoesRating: programData.Ratings[1].Value, 
-    })
-    
   }
   
-
   render() {
-    console.log(this.props.navigation)
     return (
       <SafeAreaView style={styles.container} >
         {this.state.loading ?
