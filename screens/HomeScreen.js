@@ -20,8 +20,8 @@ class HomeScreen extends React.Component {
     modalVisible: false,
     programInfo: {},
     moreInfoPoster: '../assets/images/what.gif',
-    imdbRating: 'N/A',
-    tomatoesRating: 'N/A',
+    imdbRating: null,
+    tomatoesRating: null,
     switch1Value: false,
     programType: 'movies',
     is_movie: 1,
@@ -51,6 +51,7 @@ class HomeScreen extends React.Component {
   }
 
   setUser = (userID, username) => {
+    console.log(userID)
     const setWatchlistParams = NavigationActions.setParams({
       params: { 
         user_id: userID,
@@ -77,7 +78,6 @@ class HomeScreen extends React.Component {
   }
 
   renderMovies = (movie) => {
-    console.log(movie)
     if(this.state.programType === 'movies') {
       return (
         <Tile
@@ -99,6 +99,7 @@ class HomeScreen extends React.Component {
           key={movie.id}
           imageSrc={{ uri: movie.artwork_304x171}}
           imageContainerStyle={styles.imageContainer}
+          borderWidth={2}
           activeOpacity={0.9}
           title={movie.title}
           titleStyle={styles.title}
@@ -271,19 +272,36 @@ class HomeScreen extends React.Component {
   }
 
   getMoreInfo = (cardIndex) => {
-    let imdbID = this.state.movies[cardIndex].imdb
-    fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
-    .then(resp => resp.json())
-    .then(programData => {
-      this.setState({
-        loading: false,
-        modalVisible: true,
-        programInfo: programData,
-        moreInfoPoster: programData.Poster,
-        imdbRating: programData.Ratings[0].Value, 
-        tomatoesRating: programData.Ratings[1].Value, 
+    let imdbID;
+    if (this.state.programType === 'movies') {
+      let imdbID = this.state.movies[cardIndex].imdb
+      fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
+      .then(resp => resp.json())
+      .then(programData => {
+        console.log("Movie info:", programData)
+        this.setState({
+          loading: false,
+          modalVisible: true,
+          programInfo: programData,
+          moreInfoPoster: programData.Poster,
+          imdbRating: programData.Ratings[0].Value, 
+          tomatoesRating: programData.Ratings[1].Value, 
+        })
       })
-    })
+    }else{
+      let imdbID = this.state.movies[cardIndex].imdb_id
+      fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
+      .then(resp => resp.json())
+      .then(programData => {
+        console.log("Series info:", programData)
+        this.setState({
+          loading: false,
+          modalVisible: true,
+          programInfo: programData,
+          moreInfoPoster: programData.Poster,
+        })
+      })
+    }
   }
 
   //END GESTURE ACTIONS
@@ -311,9 +329,17 @@ class HomeScreen extends React.Component {
                 />
               <View style={styles.ratingsContainer}>
                 <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
+                {this.state.imdbRating ?
                 <Text style={styles.modalText}> {this.state.imdbRating} </Text>
+                :
+                <Text style={styles.modalText}> N/A </Text>
+                }
                 <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
+                {this.state.tomatoesRating ?
                 <Text style={styles.modalText}> {this.state.tomatoesRating} </Text>
+                :
+                <Text style={styles.modalText}> N/A </Text>
+                }
               </View>
               <View style={styles.programCredits}>
                 <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
@@ -351,14 +377,13 @@ class HomeScreen extends React.Component {
             useViewOverFlow={false}
             cards={this.state.movies}
             renderCard={(movie) => this.renderMovies(movie)}
-            showSecondCard={false}
+            showSecondCard={true}
             onSwipedLeft={(cardIndex) => this.swipeLeft(cardIndex)}
             onSwipedRight={(cardIndex) => this.swipeRight(cardIndex)}
             onSwipeUp={(cardIndex) => this.swipeUp(cardIndex)}
             onTapCard={(cardIndex) => this.getMoreInfo(cardIndex)}
             onTapCardDeadZone={10}
             backgroundColor="#151515"
-            borderRadius={25}
             cardHorizontalMargin={0}
             stackSize={2}
             overlayLabels={{
@@ -366,17 +391,17 @@ class HomeScreen extends React.Component {
                 title: 'NOPE',
                 style: {
                   label: {
-                    backgroundColor: 'black',
+                    backgroundColor: 'white',
                     borderColor: 'black',
-                    color: 'white',
-                    borderWidth: 1
+                    color: 'black',
+                    borderWidth: 2
                   },
                   wrapper: {
                     flexDirection: 'column',
                     alignItems: 'flex-end',
                     justifyContent: 'flex-start',
-                    marginTop: 20,
-                    marginRight: 40
+                    marginTop: -30,
+                    marginRight: 10
                   }
                 }
               },
@@ -384,17 +409,17 @@ class HomeScreen extends React.Component {
                 title: 'ADDED',
                 style: {
                   label: {
-                    backgroundColor: 'black',
+                    backgroundColor: 'white',
                     borderColor: 'black',
-                    color: 'white',
-                    borderWidth: 1
+                    color: 'black',
+                    borderWidth: 2
                   },
                   wrapper: {
                     flexDirection: 'column',
                     alignItems: 'flex-start',
                     justifyContent: 'flex-start',
-                    marginTop: 20,
-                    marginLeft: -60
+                    marginTop: -30,
+                    marginLeft: 10
                   }
                 }
               }

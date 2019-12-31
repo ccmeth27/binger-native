@@ -5,9 +5,11 @@ import MainTabNavigator from './MainTabNavigator';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen'
 import SignInScreen from '../screens/SignInScreen'
 import SignUpScreen from '../screens/SignUpScreen'
+import SubscriptionsScreen from '../screens/SubscriptionsScreen'
 
 const AuthStack = createStackNavigator({
   SignUp: SignUpScreen, 
+  Subscriptions: SubscriptionsScreen,
   SignIn: SignInScreen
   },{
     headerMode: 'none'

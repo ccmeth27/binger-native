@@ -93,13 +93,22 @@ class SearchScreen extends React.Component {
         .then(resp => resp.json())
         .then(programData => {
             console.log(programData)
-            this.setState({
-                modalVisible: true,
-                programInfo: programData,
-                moreInfoPoster: programData.Poster,
-                imdbRating: programData.Ratings[0].Value, 
-                // tomatoesRating: programData.Ratings[1].Value, 
-          })
+            if (this.state.programType === 'movie') {
+                this.setState({
+                    modalVisible: true,
+                    programInfo: programData,
+                    moreInfoPoster: programData.Poster,
+                    imdbRating: programData.Ratings[0].Value, 
+                    tomatoesRating: programData.Ratings[1].Value, 
+                })
+            }else{
+                this.setState({
+                    modalVisible: true,
+                    programInfo: programData,
+                    moreInfoPoster: programData.Poster,
+                    imdbRating: 'N/A', 
+                    tomatoesRating: 'N/A'
+                })}
         })
     } 
     renderItem = (item) => {
@@ -115,11 +124,40 @@ class SearchScreen extends React.Component {
                         name="info"
                         size={60}
                         color="white"
-                        />
-                        }
-                        />
+                    />
+                    }
+                />
             </View>
         )
+    }
+
+    addToWatchList = () => {
+        fetch('http://localhost:3001/api/v1/user_programs', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user_id: userID,
+            guidebox_id: movieData.id,
+            is_seen: 0,
+            is_rejected: 0,
+            is_watchlist: 1,
+            title: movieData.title,
+            poster: poster,
+            release_year: released,
+            imdb: imdbID,
+            is_movie: this.state.is_movie,
+        })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            console.log(data)
+        })
+        .catch((error) => {
+        console.log(error);
+        })
     }
 
     
@@ -136,7 +174,7 @@ class SearchScreen extends React.Component {
             </View>
             <View>
                 <SearchBar
-                    placeholder="Type Here..."
+                    placeholder="Search by title"
                     onChangeText={(text) => this.updateSearch(text)}
                     value={this.state.search}
                     platform="ios"
@@ -184,8 +222,8 @@ class SearchScreen extends React.Component {
                             <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
                         </View>
                     </View>
-          </ScrollView>
-        </AnimatedModal>
+                </ScrollView>
+            </AnimatedModal>
             {this.state.loading ?
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff"/>
@@ -223,8 +261,8 @@ const styles = StyleSheet.create({
     results: {
         fontWeight: 'bold',
         color: 'white',
-        fontSize: 20,
-        marginLeft: 40,
+        fontSize: 18,
+        marginLeft: 30,
     },
     searchInput: {
         color: 'white'
@@ -273,7 +311,7 @@ const styles = StyleSheet.create({
       posterContainer: {
         marginTop: 10,
         alignSelf: 'center',
-        height: 225,
+        height: 425,
         width: 200,
         borderRadius: 20,
         
@@ -301,12 +339,15 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
       },
       ratingsLogos: {
-        marginBottom: 10,
+        // marginBottom: 10,
         alignSelf: 'center',
         justifyContent: 'center',
         height: 30,
         width: 30,
       },
+      tileContainer: {
+
+      }
     
     
 })

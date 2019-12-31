@@ -1,7 +1,7 @@
 import React from 'react'
-import { SafeAreaView, Button, StyleSheet, TouchableOpacity, Text } from 'react-native'
+import { SafeAreaView, Button, View, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import InputField from '../components/InputField'
-
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 export default class SignInScreen extends React.Component {
   static navigationOptions = {
@@ -53,6 +53,21 @@ export default class SignInScreen extends React.Component {
   render() {
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.backButtonContainer}>
+          <Button
+            type="clear"
+            style={styles.backButton}
+            title="🔙"
+            onPress={() => this.props.navigation.goBack()}
+            // icon={
+            //   <Icon 
+            //     name="back-arrow"
+            //     size={30}
+            //     color="black"
+            //     />
+            // }
+            />
+          </View>
         <Text style={styles.loginHeader}>Log In</Text>
         <InputField 
             name="username" 
@@ -105,5 +120,16 @@ const styles = StyleSheet.create({
     container: {
       marginTop: 100,
       
+    },
+    backButton: {
+      height: 60,
+      width: 60,
+      top:-10,
+    },
+    backButtonContainer: {
+      alignItems: 'flex-start',
+      paddingBottom: 30,
+      paddingLeft: 20,
     }
+    
   });

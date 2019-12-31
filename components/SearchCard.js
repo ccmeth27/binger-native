@@ -5,10 +5,6 @@ import Layout from '../constants/Layout'
 import Icon from 'react-native-vector-icons/FontAwesome'
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
 export default function SearchCard (props) {
-// export default class SearchCard extends React.Component {
-    // render(){
-        
-    
         return (
                 <View style={styles.cardView}>
                     <View style={styles.textContainer}>
@@ -19,18 +15,13 @@ export default function SearchCard (props) {
                       resizeMode="cover"
                       source={{ uri: props.item.Poster }}
                     />
-                    
-
                 </View>
-        
-            
-
         );
-    // }
 }
 
 const styles = StyleSheet.create({
     cardView: {
+        width: 350,
         borderColor: 'black',
         backgroundColor: 'transparent',
         marginHorizontal: 10,
@@ -41,6 +32,7 @@ const styles = StyleSheet.create({
         width: Layout.window.width - 85,
         height: 500,
         borderRadius: 20,
+        alignSelf: 'center'
     },
     cardTitle: {
         fontSize: 20,
@@ -52,7 +44,8 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         flexShrink: 1,
         justifyContent: 'center',
-        alignContent: 'center'
+        alignItems: 'center',
+        marginBottom: 10,
     },
     
     

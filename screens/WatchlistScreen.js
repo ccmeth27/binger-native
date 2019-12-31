@@ -30,9 +30,9 @@ class WatchlistScreen extends React.Component {
   }
   
   fetchUserWatchlist = () => {
-    const userID = this.props.navigation.state.params.user_id
+    const user_id = this.props.navigation.state.params.user_id
     let type = this.state.programType
-    fetch(`http://localhost:3001/api/v1/${type}_watchlist/${userID}`)
+    fetch(`http://localhost:3001/api/v1/${type}_watchlist/${user_id}`)
     .then(resp => resp.json())
     .then(userPrograms => {
       console.log(userPrograms.user_programs)
@@ -49,16 +49,18 @@ class WatchlistScreen extends React.Component {
     switch (value) {
         case true:
             this.setState({
+                allUserPrograms: [],
                 programType: 'series',
                 switch1Value: value,
                 loading: true,
-                // tomatoesRating: 'N/A',
+                tomatoesRating: 'N/A'
                 },
                 this.fetchUserWatchlist
             )
             break;
         case false:
             this.setState({
+                allUserPrograms: [], 
                 programType: 'movie',
                 switch1Value: value,
                 loading: true
@@ -90,9 +92,10 @@ class WatchlistScreen extends React.Component {
   }
 
   render() {
-    
+    const userID = this.props.navigation.state.params.user_id
+    console.log(userID)
       return (
-        <SafeAreaView style={{ flex: 1}}>
+        <SafeAreaView style={{ flex: 1}} >
             <Text style={styles.header}>Watchlist</Text>
             <View style={styles.switchContainer}>
                 <Text style={styles.toggleText} >Movies</Text>
@@ -112,6 +115,7 @@ class WatchlistScreen extends React.Component {
                   renderItem={({ item }) => this.renderItem(item)}
                   keyExtractor={item => item.id}
                   numColumns={2}
+                  on
               />
             </View>
             }

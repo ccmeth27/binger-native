@@ -1,5 +1,5 @@
 import React from 'react'
-import { SafeAreaView, Button, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { SafeAreaView, View, Button, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import InputField from '../components/InputField'
 
 
@@ -36,7 +36,7 @@ export default class SignUpScreen extends React.Component {
           } 
           else {
             this.props.navigation.navigate({ 
-              routeName: 'Home', 
+              routeName: 'Subscriptions', 
               params: {
                   token: response.token,
                   user_id: response.user.id,
@@ -82,13 +82,20 @@ export default class SignUpScreen extends React.Component {
             borderBottomColor={'black'}
             onChangeText={(text) => {this.setState({password_confirmation: text})}}
             />
-          <TouchableOpacity style={styles.buttonBorder}>
-            <Button style={styles.submitButton} title="Create Account!" onPress={this.handleSubmit} />
-          </TouchableOpacity>
-          <Text style={styles.text} > or if you already have an account:</Text>
-          <TouchableOpacity style={styles.buttonBorder}>
-            <Button style={styles.submitButton} title="Sign In" onPress={() => this.props.navigation.navigate('SignIn')}/>
-          </TouchableOpacity>
+          <View style={styles.continueButton}>
+            <Button 
+              title="Continue ▷" 
+              color="black" 
+              onPress={this.handleSubmit} />
+          </View>
+          <Text style={styles.text} > Already have an account? Click below to Sign In:</Text>
+          <View style={styles.signInButton}>
+            <Button 
+              title="Sign In" 
+              type="clear" 
+              color="black" 
+              onPress={() => this.props.navigation.navigate('SignIn')}/>
+          </View>
         </SafeAreaView>
       );
     }
@@ -98,10 +105,12 @@ export default class SignUpScreen extends React.Component {
 
   const styles = StyleSheet.create({
     text: {
+      width: 250,
       fontSize: 20,
       alignSelf: 'center',
       marginHorizontal: 20,
       marginVertical: 20,
+      marginTop: 40,
     },
     container: {
       marginTop: 100,
@@ -115,19 +124,26 @@ export default class SignUpScreen extends React.Component {
       top: 20,
       alignSelf: 'center'
     },
-    submitButton: {
-      paddingTop: 20,
-    },
-    buttonBorder: {
-      padding: 20,
-      // bottom: 60,
+    continueButton: {
+      padding: 10,
+      marginTop: 30,
       borderWidth: 1,
       borderRadius: 25,
-      borderColor: 'white',
-      backgroundColor: 'grey',
+      borderColor: 'black',
+      backgroundColor: 'green',
       width: 200,
       alignSelf: 'center',
       justifyContent: 'flex-end'
-      
+    },
+    signInButton: {
+      padding: 10,
+      marginTop: 30,
+      // borderWidth: 1,
+      borderRadius: 25,
+      // borderColor: 'black',
+      backgroundColor: 'blue',
+      width: 200,
+      alignSelf: 'center',
+      justifyContent: 'flex-end'
     }
   });
