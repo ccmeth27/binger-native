@@ -33,23 +33,23 @@ class HomeScreen extends React.Component {
   componentDidMount() {
     let userID = this.props.navigation.state.params.user_id
     let username = this.props.navigation.state.params.username
-    this.fetchPreviouslySwiped(userID)
+    this.fetchPrograms()
     
     this.setUser(userID, username)
   }
 
-  fetchPreviouslySwiped = (userID) => {
-    fetch(`http://localhost:3001/api/v1/user_programs/${userID}`)
-    .then(resp => resp.json())
-    .then(userSwiped => {
-      // console.log(userSwiped)
-      this.setState({
-        previouslySwiped: userSwiped.user_programs
-      },
-      this.fetchPrograms()
-      )
-    })
-  }
+  // fetchPreviouslySwiped = (userID) => {
+  //   fetch(`http://localhost:3001/api/v1/user_programs/${userID}`)
+  //   .then(resp => resp.json())
+  //   .then(userSwiped => {
+  //     // console.log(userSwiped)
+  //     this.setState({
+  //       previouslySwiped: userSwiped.user_programs
+  //     },
+  //     this.fetchPrograms()
+  //     )
+  //   })
+  // }
 
   fetchPrograms() {
     let type = this.state.programType
@@ -150,7 +150,7 @@ class HomeScreen extends React.Component {
               loading: true,
               is_movie: 0,
               },
-              this.fetchMovies
+              this.fetchPrograms
           )
           break;
       case false:
@@ -160,7 +160,7 @@ class HomeScreen extends React.Component {
               loading: true,
               is_movie: 1,
               },
-              this.fetchMovies
+              this.fetchPrograms
           )
           break;
   }
@@ -381,7 +381,7 @@ class HomeScreen extends React.Component {
                       <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
                       <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
                   </View>
-                  <View style={styles.buttonsContainer}>
+                  {/* <View style={styles.buttonsContainer}>
                     <Button
                         type="clear"
                         style={styles.rejectButton}
@@ -406,7 +406,7 @@ class HomeScreen extends React.Component {
                         />
                         }
                     />
-                  </View>
+                  </View> */}
                 </View>
               </Modal>
             </View>

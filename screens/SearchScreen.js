@@ -364,9 +364,9 @@ class SearchScreen extends React.Component {
                     </View>
                     :
                     <View>
-                        {this.state.isEmpty && this.state.isDone ?
+                        {/* {this.state.isEmpty && this.state.isDone ?
                         <BrowseFlatList mostPopular={this.state.mostPopular} renderMostPopular={this.renderMostPopular}/>
-                        :
+                        :} */}
                         <View>
                             <FlatList
                                 data={this.state.searchResults}
@@ -376,7 +376,7 @@ class SearchScreen extends React.Component {
                                 
                                 />
                         </View>
-                        }
+                        
                         
                     </View>
                     }
