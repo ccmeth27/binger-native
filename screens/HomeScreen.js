@@ -1,11 +1,12 @@
 import React from 'react'
-import { SafeAreaView, ScrollView, StyleSheet, Platform, Text, Image, View, ActivityIndicator } from 'react-native'
+import { SafeAreaView, Modal, ScrollView, StyleSheet, Platform, Text, Image, View, ActivityIndicator } from 'react-native'
 import Swiper from 'react-native-deck-swiper'
-import { Tile, Divider } from 'react-native-elements'
+import { Tile, Button } from 'react-native-elements'
 import Layout from '../constants/Layout'
 import { AnimatedModal } from "react-native-modal-animated"
 import { NavigationActions } from 'react-navigation';
 import ToggleSwitch from '../components/ToggleSwitch'
+import Icon from 'react-native-vector-icons/FontAwesome'
 // import FastImage from 'react-native-fast-image'
 
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49 
@@ -13,7 +14,8 @@ const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49
 class HomeScreen extends React.Component {
   
   state = {
-    movies: [],
+    programs: [],
+    previouslySwiped: [],
     loading: true,
     user_id: null,
     token: null,
@@ -31,17 +33,31 @@ class HomeScreen extends React.Component {
   componentDidMount() {
     let userID = this.props.navigation.state.params.user_id
     let username = this.props.navigation.state.params.username
-    this.fetchMovies()
+    this.fetchPreviouslySwiped(userID)
+    
     this.setUser(userID, username)
+  }
+
+  fetchPreviouslySwiped = (userID) => {
+    fetch(`http://localhost:3001/api/v1/user_programs/${userID}`)
+    .then(resp => resp.json())
+    .then(userSwiped => {
+      console.log(userSwiped)
+      this.setState({
+        previouslySwiped: userSwiped.user_programs
+      },
+      this.fetchMovies()
+      )
+    })
   }
 
   fetchMovies() {
     let type = this.state.programType
-      fetch(`http://api-public.guidebox.com/v2/${type}?api_key=beeb2b0cc73bdf55f4ac9f1d8e9f595f9aaa14b6`)
+      fetch(`http://api-public.guidebox.com/v2/${type}?api_key=b0ca45b98b8a26cc9bb30019569448b2daa0090f&limit=50`)
       .then(resp => resp.json())
-      .then(movieData => {
+      .then(programData => {
           this.setState({
-          movies: movieData.results,
+          programs: programData.results,
           loading: false
           })
       })
@@ -49,6 +65,18 @@ class HomeScreen extends React.Component {
           console.error(error);
         });
   }
+
+  filterPrograms = () => {
+    let filteredPrograms = []
+    let guidebox = this.state.programs
+    let swipedPrograms = this.state.previouslySwiped
+    guidebox = guidebox.filter((item) => {
+      return !swipedPrograms.includes(item.imdb_id)
+    })
+    console.log(guidebox)
+  }
+
+  
 
   setUser = (userID, username) => {
     console.log(userID)
@@ -77,17 +105,17 @@ class HomeScreen extends React.Component {
     
   }
 
-  renderMovies = (movie) => {
+  renderPrograms = (program) => {
     if(this.state.programType === 'movies') {
       return (
         <Tile
-          key={movie.id}
-          imageSrc={{ uri: movie.poster_400x570}}
+          key={program.id}
+          imageSrc={{ uri: program.poster_400x570}}
           imageContainerStyle={styles.imageContainer}
           activeOpacity={0.9}
-          title={movie.title}
+          title={program.title}
           titleStyle={styles.title}
-          caption={movie.release_year}
+          caption={program.release_year}
           captionStyle={styles.caption}
           containerStyle={styles.tileContainer}
           featured
@@ -96,14 +124,14 @@ class HomeScreen extends React.Component {
     } else {
       return (
         <Tile
-          key={movie.id}
-          imageSrc={{ uri: movie.artwork_304x171}}
+          key={program.id}
+          imageSrc={{ uri: program.artwork_304x171}}
           imageContainerStyle={styles.imageContainer}
           borderWidth={2}
           activeOpacity={0.9}
-          title={movie.title}
+          title={program.title}
           titleStyle={styles.title}
-          caption={'First Aired:' + "" + movie.first_aired}
+          caption={'First Aired:' + "" + program.first_aired}
           captionStyle={styles.caption}
           containerStyle={styles.tileContainer}
           featured
@@ -143,19 +171,19 @@ class HomeScreen extends React.Component {
   //GESTURE ACTIONS
 
   swipeLeft = (cardIndex) => {
-    let movieData = this.state.movies[cardIndex]
+    let programData = this.state.programs[cardIndex]
     let userID = this.props.navigation.state.params.user_id
     let poster;
     let released;
     let imdbID;
     if(this.state.is_movie === 0){
-      poster = movieData.artwork_304x171
-      imdbID = movieData.imdb_id
-      released = movieData.first_aired
+      poster = programData.artwork_304x171
+      imdbID = programData.imdb_id
+      released = programData.first_aired
     }else{
-      poster = movieData.poster_400x570
-      imdbID = movieData.imdb
-      released = movieData.release_year
+      poster = programData.poster_400x570
+      imdbID = programData.imdb
+      released = programData.release_year
     }
     fetch('http://localhost:3001/api/v1/user_programs', {
       method: 'POST',
@@ -165,11 +193,11 @@ class HomeScreen extends React.Component {
       },
       body: JSON.stringify({
         user_id: userID,
-        guidebox_id: movieData.id,
+        guidebox_id: programData.id,
         is_seen: 0,
         is_rejected: 1,
         is_watchlist: 0,
-        title: movieData.title,
+        title: programData.title,
         poster: poster,
         release_year: released,
         imdb: imdbID,
@@ -186,19 +214,19 @@ class HomeScreen extends React.Component {
   }
 
   swipeRight = (cardIndex) => {
-    let movieData = this.state.movies[cardIndex]
+    let programData = this.state.programs[cardIndex]
     let userID = this.props.navigation.state.params.user_id
     let poster;
     let released;
     let imdbID;
     if(this.state.is_movie === 0){
-      poster = movieData.artwork_304x171
-      imdbID = movieData.imdb_id
-      released = movieData.first_aired
+      poster = programData.artwork_304x171
+      imdbID = programData.imdb_id
+      released = programData.first_aired
     }else{
-      poster = movieData.poster_400x570
-      imdbID = movieData.imdb
-      released = movieData.release_year
+      poster = programData.poster_400x570
+      imdbID = programData.imdb
+      released = programData.release_year
     }
     fetch('http://localhost:3001/api/v1/user_programs', {
       method: 'POST',
@@ -208,11 +236,11 @@ class HomeScreen extends React.Component {
       },
       body: JSON.stringify({
         user_id: userID,
-        guidebox_id: movieData.id,
+        guidebox_id: programData.id,
         is_seen: 0,
         is_rejected: 0,
         is_watchlist: 1,
-        title: movieData.title,
+        title: programData.title,
         poster: poster,
         release_year: released,
         imdb: imdbID,
@@ -229,19 +257,19 @@ class HomeScreen extends React.Component {
   }
 
   swipeUp = (cardIndex) => {
-    let movieData = this.state.movies[cardIndex]
+    let programData = this.state.programs[cardIndex]
     let userID = this.props.navigation.state.params.user_id
     let poster;
     let released;
     let imdbID;
     if(this.state.is_movie === 0){
-      poster = movieData.artwork_304x171
-      imdbID = movieData.imdb_id
-      released = movieData.first_aired
+      poster = programData.artwork_304x171
+      imdbID = programData.imdb_id
+      released = programData.first_aired
     }else{
-      poster = movieData.poster_400x570
-      imdbID = movieData.imdb
-      released = movieData.release_year
+      poster = programData.poster_400x570
+      imdbID = programData.imdb
+      released = programData.release_year
     }
     fetch('http://localhost:3001/api/v1/user_programs', {
       method: 'POST',
@@ -251,11 +279,11 @@ class HomeScreen extends React.Component {
       },
       body: JSON.stringify({
         user_id: userID,
-        guidebox_id: movieData.id,
+        guidebox_id: programData.id,
         is_seen: 1,
         is_rejected: 0,
         is_watchlist: 0,
-        title: movieData.title,
+        title: programData.title,
         poster: poster,
         release_year: released,
         imdb: imdbID,
@@ -274,7 +302,7 @@ class HomeScreen extends React.Component {
   getMoreInfo = (cardIndex) => {
     let imdbID;
     if (this.state.programType === 'movies') {
-      let imdbID = this.state.movies[cardIndex].imdb
+      imdbID = this.state.programs[cardIndex].imdb
       fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
       .then(resp => resp.json())
       .then(programData => {
@@ -289,7 +317,7 @@ class HomeScreen extends React.Component {
         })
       })
     }else{
-      let imdbID = this.state.movies[cardIndex].imdb_id
+      let imdbID = this.state.programs[cardIndex].imdb_id
       fetch(`http://www.omdbapi.com/?i=${imdbID}&apikey=6743b2b0`)
       .then(resp => resp.json())
       .then(programData => {
@@ -309,49 +337,80 @@ class HomeScreen extends React.Component {
   render() {
     return (
       <SafeAreaView style={styles.container} >
-        <AnimatedModal
-          visible={this.state.modalVisible}
-          onBackdropPress={() => {
-            this.setState({ modalVisible: false });
-          }}
-          animationType="slide"
-          duration={600}
+        <View style={styles.mainContainer}>
+          <Modal
+            animationType={'slide'}
+            transparent={false}
+            visible={this.state.modalVisible}
           >
-          <ScrollView 
-            alwaysBounceVertical
-            >
-            <View style={styles.modalCard}>
-              <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
-              <Divider style={styles.divider}/>
-              <Tile 
-                imageSrc={{uri: this.state.moreInfoPoster}} 
-                imageContainerStyle={styles.posterContainer}
+          <View style={styles.modalContainer}>
+            <View >
+              <Button
+                // color="#000"
+                buttonStyle={styles.closeButton}
+                type="clear"
+                onPress={() => this.setState({
+                  modalVisible: false
+                })}
+                title="Close"
                 />
-              <View style={styles.ratingsContainer}>
-                <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
-                {this.state.imdbRating ?
-                <Text style={styles.modalText}> {this.state.imdbRating} </Text>
-                :
-                <Text style={styles.modalText}> N/A </Text>
-                }
-                <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
-                {this.state.tomatoesRating ?
-                <Text style={styles.modalText}> {this.state.tomatoesRating} </Text>
-                :
-                <Text style={styles.modalText}> N/A </Text>
-                }
               </View>
-              <View style={styles.programCredits}>
-                <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
-                <Text style={styles.modalText}> Release Date: {this.state.programInfo.Released}</Text>
-                <Text style={styles.modalText}> Plot: {this.state.programInfo.Plot}</Text>
-                <Text style={styles.modalText}> Cast: {this.state.programInfo.Actors}</Text>
-                <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
-                <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
-              </View>
+                  <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
+                  <Tile 
+                    imageSrc={{uri: this.state.moreInfoPoster}} 
+                    imageContainerStyle={styles.posterContainer}
+                    />
+                  <View style={styles.ratingsContainer}>
+                  <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
+                  {this.state.imdbRating ?
+                  <Text style={styles.modalText}> {this.state.imdbRating} </Text>
+                  :
+                  <Text style={styles.modalText}> N/A </Text>
+                  }
+                  <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
+                  {this.state.tomatoesRating ?
+                  <Text style={styles.modalText}> {this.state.tomatoesRating} </Text>
+                  :
+                  <Text style={styles.modalText}> N/A </Text>
+                  }
+                  </View>
+                  <View style={styles.programCredits}>
+                      <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
+                      <Text style={styles.modalText}> Release Date: {this.state.programInfo.Released}</Text>
+                      <Text style={styles.modalText}> Plot: {this.state.programInfo.Plot}</Text>
+                      <Text style={styles.modalText}> Cast: {this.state.programInfo.Actors}</Text>
+                      <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
+                      <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
+                  </View>
+                  <View style={styles.buttonsContainer}>
+                    <Button
+                        type="clear"
+                        style={styles.rejectButton}
+                        onPress={() => this.addToRejectedList()}
+                        icon={
+                        <Icon
+                            name="trash"
+                            size={35}
+                            color="red"
+                        />
+                      }
+                    />
+                    <Button
+                        type="clear"
+                        style={styles.seenButton}
+                        onPress={() => this.addToSeenList()}
+                        icon={
+                        <Icon
+                            name="eye-slash"
+                            size={35}
+                            color="blue"
+                        />
+                        }
+                    />
+                  </View>
+                </View>
+              </Modal>
             </View>
-          </ScrollView>
-        </AnimatedModal>
         <View>
           <View style={styles.switchContainer}>
               <Text style={styles.toggleText} >Movies</Text>
@@ -367,16 +426,16 @@ class HomeScreen extends React.Component {
         </View>
         :
         <View>
-          {this.state.movies.map(movie =>
+          {this.state.programs.map(program =>
           <Swiper
             ref={swiper => {
               this.swiper = swiper;
             }}
-            key={movie.id}
+            key={program.id}
             style={styles.tileContainer}
             useViewOverFlow={false}
-            cards={this.state.movies}
-            renderCard={(movie) => this.renderMovies(movie)}
+            cards={this.state.programs}
+            renderCard={(program) => this.renderPrograms(program)}
             showSecondCard={true}
             onSwipedLeft={(cardIndex) => this.swipeLeft(cardIndex)}
             onSwipedRight={(cardIndex) => this.swipeRight(cardIndex)}
@@ -448,6 +507,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingTop: 10,
     bottom: 40,
+    backgroundColor: 'transparent',
   },
   imageContainer: {
     width: Layout.window.width - 40,
@@ -458,12 +518,12 @@ const styles = StyleSheet.create({
   title: {
     position: 'absolute',
     left: 10,
-    bottom: 30,
+    bottom: 20,
   },
   caption: {
     position: 'absolute',
     left: 10,
-    bottom: 10,
+    bottom: 5,
   },
   switchContainer: {
     position: 'relative',
@@ -482,15 +542,15 @@ const styles = StyleSheet.create({
     flex: 1,
     width: Layout.window.width,
     height: Layout.window.height - BOTTOM_BAR_HEIGHT, 
-    top: 90,
+    top: 80,
     backgroundColor: 'black',
     alignItems: 'center',
   },
   posterContainer: {
-    marginTop: 10,
+    marginTop: 5,
     alignSelf: 'center',
-    height: 225,
-    width: 200,
+    height: 200,
+    width: 175,
     borderRadius: 20,
     
   },
@@ -500,10 +560,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 20,
   },
+  ratingsText: {
+    color: 'white',
+    top: 5,
+    marginLeft: 5,
+  },
   titleText: {
     color: 'white',
     fontWeight: 'bold',
-    paddingTop: 20,
+    paddingTop: 5,
     alignSelf: 'center',
     fontSize: 30,
     marginHorizontal: 20,
@@ -527,5 +592,38 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center'
 
-  }
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#121212'
+  },
+  closeButton: {
+    height: 80,
+    top:20,
+  },
+  buttonsContainer: {
+    marginTop: 25,
+    width: Layout.window.width
+  },
+  seenButton: {
+    alignSelf: 'flex-end',
+    bottom: 55,
+    marginRight: 50,
+    height: 50,
+    width: 50,
+    borderRadius: 45,
+    backgroundColor: 'white'
+  },
+  rejectButton: {
+    alignSelf: 'flex-start',
+    marginLeft: 50,
+    height: 50,
+    width: 50,
+    borderRadius: 45,
+    backgroundColor: 'white'
+  },
+  ratingsContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+  },
 })

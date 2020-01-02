@@ -1,7 +1,7 @@
 import React from 'react'
 import { 
     ActivityIndicator, 
-    ScrollView, 
+    Modal, 
     Platform, 
     Text, 
     SafeAreaView, 
@@ -16,7 +16,7 @@ import ToggleSwitch from '../components/ToggleSwitch'
 import Layout from '../constants/Layout'
 // import MoreInfoModal from '../components/MoreInfoModal'
 import Icon from 'react-native-vector-icons/FontAwesome'
-import { AnimatedModal } from "react-native-modal-animated"
+// import { AnimatedModal } from "react-native-modal-animated"
 import { Tile } from 'react-native-elements'
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49
 
@@ -37,7 +37,7 @@ class SearchScreen extends React.Component {
     };
 
     updateSearch = text => {
-        console.log(text)
+        // console.log(text)
         this.setState({
             search: text,
             loading: true
@@ -45,15 +45,15 @@ class SearchScreen extends React.Component {
     };
 
     getSearchResults = () => {
-        console.log(this.state.switch1Value)
-        console.log(this.state.programType)
+        // console.log(this.state.switch1Value)
+        // console.log(this.state.programType)
         let type = this.state.programType
         let input = this.state.search
         let page = this.state.page
         fetch(`http://www.omdbapi.com/?s=${input}&type=${type}&apikey=6743b2b0`)
         .then(resp => resp.json())
         .then(results => {
-            console.log(results.Search)
+            // console.log(results.Search)
             this.setState({
                 searchResults: results.Search,
                 loading: false,
@@ -115,23 +115,30 @@ class SearchScreen extends React.Component {
         return(
             <View>
                 <SearchCard item={item}/>
-                <Button
-                    type="clear"
-                    style={styles.infoButton}
-                    onPress={() => this.getMoreInfo(item)}
-                    icon={
-                    <Icon
-                        name="info"
-                        size={60}
-                        color="white"
+                    <Button
+                        type="clear"
+                        style={styles.infoButton}
+                        onPress={() => this.getMoreInfo(item)}
+                        icon={
+                        <Icon
+                            name="info"
+                            size={35}
+                            color="purple"
+                        />
+                        }
                     />
-                    }
-                />
             </View>
         )
     }
 
-    addToWatchList = () => {
+    addToWatchList = (item) => {
+        let userID = this.props.navigation.state.params.user_id
+        let type;
+        if (item.Type === 'movie'){
+            type = 1
+        }else{
+            type = 0
+        }
         fetch('http://localhost:3001/api/v1/user_programs', {
         method: 'POST',
         headers: {
@@ -140,15 +147,51 @@ class SearchScreen extends React.Component {
         },
         body: JSON.stringify({
             user_id: userID,
-            guidebox_id: movieData.id,
+            guidebox_id: 0,
             is_seen: 0,
             is_rejected: 0,
             is_watchlist: 1,
-            title: movieData.title,
-            poster: poster,
-            release_year: released,
-            imdb: imdbID,
-            is_movie: this.state.is_movie,
+            title: item.Title,
+            poster: item.Poster,
+            release_year: item.Year,
+            imdb: item.imdbID,
+            is_movie: type,
+        })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            console.log(data)
+        })
+        .catch((error) => {
+        console.log(error);
+        })
+    }
+
+    addToSeenList = (item) => {
+        let userID = this.props.navigation.state.params.user_id
+        let type;
+        if (item.Type === 'movie'){
+            type = 1
+        }else{
+            type = 0
+        }
+        fetch('http://localhost:3001/api/v1/user_programs', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user_id: userID,
+            guidebox_id: 0,
+            is_seen: 1,
+            is_rejected: 0,
+            is_watchlist: 0,
+            title: item.Title,
+            poster: item.Poster,
+            release_year: item.Year,
+            imdb: item.imdbID,
+            is_movie: type,
         })
         })
         .then(resp => resp.json())
@@ -188,42 +231,72 @@ class SearchScreen extends React.Component {
                 
                 />
             </View>
-            <Text style={styles.results}>Results:</Text>
-            <AnimatedModal
+            <View>
+            <Modal
+                animationType={'slide'}
+                transparent={false}
                 visible={this.state.modalVisible}
-                onBackdropPress={() => {
-                  this.setState({ modalVisible: false });
-                }}
-                animationType="slide"
-                duration={600}
             >
-                <ScrollView 
-                    contentContainer={styles.scrollView}
-                    alwaysBounceVertical
-                >
-                    <View style={styles.modalCard}>
-                        <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
-                        <Tile 
-                          imageSrc={{uri: this.state.moreInfoPoster}} 
-                          imageContainerStyle={styles.posterContainer}
+          <View style={styles.modalContainer}>
+            <View >
+              <Button
+                // color="#000"
+                buttonStyle={styles.closeButton}
+                type="clear"
+                onPress={() => this.setState({
+                  modalVisible: false
+                })}
+                title="Close"
+                />
+              </View>
+                  <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
+                  <Tile 
+                    imageSrc={{uri: this.state.moreInfoPoster}} 
+                    imageContainerStyle={styles.posterContainer}
+                    />
+                  <View style={styles.ratingsContainer}>
+                      <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
+                      <Text style={styles.ratingsText}> {this.state.imdbRating} </Text>
+                      <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
+                      <Text style={styles.ratingsText}> {this.state.tomatoesRating} </Text>
+                  </View>
+                  <View style={styles.programCredits}>
+                      <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
+                      <Text style={styles.modalText}> Release Date: {this.state.programInfo.Released}</Text>
+                      <Text style={styles.modalText}> Plot: {this.state.programInfo.Plot}</Text>
+                      <Text style={styles.modalText}> Cast: {this.state.programInfo.Actors}</Text>
+                      <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
+                      <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
+                  </View>
+                  <View style={styles.buttonsContainer}>
+                    <Button
+                          type="clear"
+                          style={styles.seenButton}
+                          onPress={() => this.addToSeenList(item)}
+                          icon={
+                          <Icon
+                              name="eye-slash"
+                              size={35}
+                              color="blue"
                           />
-                        <View style={styles.ratingsContainer}>
-                            <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
-                            <Text style={styles.modalText}> {this.state.imdbRating} </Text>
-                            <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
-                            <Text style={styles.modalText}> {this.state.tomatoesRating} </Text>
-                        </View>
-                        <View style={styles.programCredits}>
-                            <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
-                            <Text style={styles.modalText}> Release Date: {this.state.programInfo.Released}</Text>
-                            <Text style={styles.modalText}> Plot: {this.state.programInfo.Plot}</Text>
-                            <Text style={styles.modalText}> Cast: {this.state.programInfo.Actors}</Text>
-                            <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
-                            <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
-                        </View>
-                    </View>
-                </ScrollView>
-            </AnimatedModal>
+                          }
+                      />
+                    <Button
+                        type="clear"
+                        style={styles.addButton}
+                        onPress={() => this.addToWatchlist(item)}
+                        icon={
+                        <Icon
+                            name="bookmark"
+                            size={35}
+                            color="green"
+                        />
+                      }
+                    />
+                  </View>
+                </View>
+              </Modal>
+            </View>
             {this.state.loading ?
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff"/>
@@ -258,23 +331,18 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#151515',
     },
-    results: {
-        fontWeight: 'bold',
-        color: 'white',
-        fontSize: 18,
-        marginLeft: 30,
-    },
     searchInput: {
-        color: 'white'
+        color: 'white',
     },
     loadingContainer: {
-        flex: 2,
+        flex: 1,
         marginVertical: 90,
         justifyContent: 'center'
     },
     searchContainer: {
         backgroundColor: '#151515',
-        marginVertical: 5,
+        marginTop: 5,
+        marginHorizontal: 5,
     },
     flatListStyle: {
         flex: 1,
@@ -283,22 +351,27 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignContent: 'center',
         justifyContent: 'center',
-        marginTop: 20,
-        marginBottom: 10,
+        marginTop: 10,
     },
     toggleText: {
         color: 'white',
         padding: 5,
         fontSize: 16,
     },
+    buttonsContainer: {
+        flexDirection: 'row',
+        height: 60,
+        bottom: 50,
+    },
     infoButton: {
-        height: 75,
-        width: 75,
-        backgroundColor: 'purple',
+        height: 50,
+        width: 50,
+        backgroundColor: 'white',
         borderRadius: 45,
-        bottom: 45,
-        alignSelf: 'flex-end'
-
+        alignSelf: 'center',
+        borderWidth: 2,
+        borderColor: 'purple',
+        bottom: 25,
     },
     modalCard: {
         flex: 1,
@@ -307,60 +380,80 @@ const styles = StyleSheet.create({
         top: 90,
         backgroundColor: 'black',
         alignItems: 'center',
-      },
-      posterContainer: {
-        marginTop: 10,
-        alignSelf: 'center',
-        height: 425,
-        width: 200,
-        borderRadius: 20,
-        
-      },
-      modalText: {
-        color: 'white',
-        fontWeight: 'bold',
-        marginTop: 10,
-        marginHorizontal: 20,
-      },
-      titleText: {
-        color: 'white',
-        fontWeight: 'bold',
-        paddingTop: 20,
-        alignSelf: 'center',
-        fontSize: 30,
-        marginHorizontal: 20,
-      },
-      divider: {
-        marginHorizontal: 20,
-        marginVertical: 10,
-      },
-      ratingsContainer: {
-        flexDirection: 'row',
-        alignSelf: 'center',
-      },
-      ratingsLogos: {
-        // marginBottom: 10,
-        alignSelf: 'center',
-        justifyContent: 'center',
-        height: 30,
-        width: 30,
-      },
-      tileContainer: {
+    },
+    posterContainer: {
+       marginTop: 10,
+       alignSelf: 'center',
+       height: 175,
+       width: 175,
+       borderRadius: 20,
 
-      }
-    
-    
+    },
+    modalText: {
+       color: 'white',
+       fontWeight: 'bold',
+       marginTop: 10,
+       marginHorizontal: 20,
+    },
+    ratingsText: {
+       color: 'white',
+       fontWeight: 'bold',
+       marginTop: 5,
+       marginHorizontal: 20,
+    },
+    titleText: {
+       color: 'white',
+       fontWeight: 'bold',
+       alignSelf: 'center',
+       fontSize: 30,
+       marginHorizontal: 20,
+    },
+     divider: {
+       marginHorizontal: 20,
+       marginVertical: 10,
+    },
+    ratingsContainer: {
+       flexDirection: 'row',
+       alignSelf: 'center',
+    },
+    ratingsLogos: {
+       alignSelf: 'center',
+       justifyContent: 'center',
+       height: 30,
+       width: 30,
+    },
+    modalContainer: {
+       flex: 1,
+       backgroundColor: '#121212'
+    },
+    closeButton: {
+       height: 80,
+       top:20,
+       color: 'white'
+    },
+    buttonsContainer: {
+       marginTop: 25,
+       width: Layout.window.width
+    },
+    addButton: {
+       alignSelf: 'flex-end',
+       bottom: 52,
+       marginRight: 50,
+       height: 50,
+       width: 50,
+       borderRadius: 45,
+       backgroundColor: 'white'
+    },
+    seenButton: {
+       alignSelf: 'flex-start',
+       marginLeft: 50,
+       height: 50,
+       width: 50,
+       borderRadius: 45,
+       backgroundColor: 'white'
+    },
+    ratingsContainer: {
+       flexDirection: 'row',
+       alignSelf: 'center',
+    },
 })
-
-{/* <View>
-    <MoreInfoModal
-        visible={this.state.modalVisible}
-        onBackdropPress={() => {
-            this.setState({ modalVisible: false });
-        }}
-        programInfo={this.state.programInfo}
-        imdbRating={this.state.imdbRating}
-        tomatoesRating={this.state.tomatoesRating}
-        moreInfoPoster={this.moreInfoPoster}            
-    />
-</View> */}

@@ -1,7 +1,8 @@
 import React from 'react'
-import { SafeAreaView, Button, View, StyleSheet, TouchableOpacity, Text } from 'react-native'
+import { SafeAreaView, View, Button, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import InputField from '../components/InputField'
-import Icon from 'react-native-vector-icons/FontAwesome'
+// import Icon from 'react-native-vector-icons/FontAwesome'
+// import { Button } from 'react-native-elements'
 
 export default class SignInScreen extends React.Component {
   static navigationOptions = {
@@ -24,8 +25,8 @@ export default class SignInScreen extends React.Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        username: usernameInput,
-        password: passwordInput
+        username: this.state.username,
+        password: this.state.password
       })
     })
     .then(resp => resp.json())
@@ -57,15 +58,9 @@ export default class SignInScreen extends React.Component {
           <Button
             type="clear"
             style={styles.backButton}
-            title="🔙"
+            title="◀︎ back"
+            color="white"
             onPress={() => this.props.navigation.goBack()}
-            // icon={
-            //   <Icon 
-            //     name="back-arrow"
-            //     size={30}
-            //     color="black"
-            //     />
-            // }
             />
           </View>
         <Text style={styles.loginHeader}>Log In</Text>
@@ -73,18 +68,18 @@ export default class SignInScreen extends React.Component {
             name="username" 
             labelText="USERNAME" 
             inputType="username" 
-            borderBottomColor={'black'}
+            borderBottomColor={'white'}
             onChangeText={(text) => {this.setState({username: text})}} 
-            />
+        />
         <InputField 
             name="password" 
             labelText="PASSWORD" 
             inputType="password" 
-            borderBottomColor={'black'}
+            borderBottomColor={'white'}
             onChangeText={(text) => {this.setState({password: text})}} 
-            />
+        />
         <TouchableOpacity style={styles.buttonBorder}>
-            <Button style={styles.submitButton} title="Sign In" onPress={this.handleSubmit} />
+            <Button style={styles.submitButton} color="white" title="Sign In" onPress={this.handleSubmit} />
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -98,12 +93,12 @@ const styles = StyleSheet.create({
       paddingTop: 40,
     },
     buttonBorder: {
-      padding: 20,
+      padding: 10,
       marginTop: 20,
-      borderWidth: 1,
+      borderWidth: 0,
       borderRadius: 25,
       borderColor: 'white',
-      backgroundColor: 'grey',
+      backgroundColor: '#20DB3A',
       width: 150,
       alignSelf: 'center',
       justifyContent: 'center'
@@ -111,15 +106,15 @@ const styles = StyleSheet.create({
     },
     loginHeader: {
       fontSize: 28,
-      color: 'black',
+      color: 'white',
       fontWeight: "bold",
       marginBottom: 50,
-      top: 20,
+      top: 30,
       alignSelf: 'center'
     },
     container: {
-      marginTop: 100,
-      
+      flex: 1,
+      backgroundColor: '#121212'
     },
     backButton: {
       height: 60,

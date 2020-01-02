@@ -7,23 +7,59 @@ import SignInScreen from '../screens/SignInScreen'
 import SignUpScreen from '../screens/SignUpScreen'
 import SubscriptionsScreen from '../screens/SubscriptionsScreen'
 
-const AuthStack = createStackNavigator({
-  SignUp: SignUpScreen, 
-  Subscriptions: SubscriptionsScreen,
-  SignIn: SignInScreen
+const AuthStack = createStackNavigator(
+  {
+    SignUp: {
+      screen: SignUpScreen,
+      navigationOptions: {
+        header: null,
+        
+      }
+    },
+    Subscriptions: {
+      screen: SubscriptionsScreen,
+      navigationOptions: {
+        headerShown: false,
+        header: null,
+      }
+    },
+    SignIn: {
+      screen: SignInScreen,
+      navigationOptions: {
+        headerShown: false,
+        header: null,
+      },
+    },
   },{
-    headerMode: 'none'
-})
+    initialRouteName: 'SignUp',
+  }
+)
+
 
 export default createAppContainer(
   createSwitchNavigator({
-    AuthLoading: AuthLoadingScreen,
-    Main: MainTabNavigator,
-    Auth: AuthStack,
-  },
-  {
+    AuthLoading: {
+      screen: AuthLoadingScreen,
+      navigationOptions: {
+        headerShown: false,
+      }
+    },
+    Main: {
+      screen: MainTabNavigator,
+      navigationOptions: {
+        headerShown: false,
+      }
+    },
+    Auth: {
+      screen: AuthStack,
+      navigationOptions: {
+        headerShown: false,
+      }
+    }
+  },{
     initialRouteName: 'AuthLoading',
-    
+    headerMode: "none",
   }
+  
   )
 );

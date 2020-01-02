@@ -67,13 +67,13 @@ const tabNavigator = createBottomTabNavigator({
     Home: {
       screen: HomeScreen,
       navigationOptions: {
-        title: 'Discover'
+        title: 'Discover',
       }
     },
     Watchlist: {
       screen: WatchlistScreen,
       navigationOptions: {
-        title: 'My Wishlist'
+        title: 'My Wishlist',
       }
     },
     Search: {

@@ -8,7 +8,7 @@ export default function SearchCard (props) {
         return (
                 <View style={styles.cardView}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.cardTitle}> {props.item.Title} - {props.item.Year}</Text>
+                        <Text style={styles.cardTitle}> {props.item.Title}</Text>
                     </View>
                     <Image
                       style={styles.cardImage}
@@ -25,12 +25,12 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         backgroundColor: 'transparent',
         marginHorizontal: 10,
-        marginTop: 15,
+        marginTop: 10,
         
     },
     cardImage: {
         width: Layout.window.width - 85,
-        height: 500,
+        height: 450,
         borderRadius: 20,
         alignSelf: 'center'
     },
@@ -41,11 +41,12 @@ const styles = StyleSheet.create({
         
     },
     textContainer: {
-        flexWrap: 'wrap',
+        // flexWrap: 'wrap',
+        height: 40,
         flexShrink: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 15,
     },
     
     

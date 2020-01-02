@@ -1,17 +1,12 @@
 import React from 'react'
 import { 
     SafeAreaView, 
-    ScrollView, 
     StyleSheet, 
-    Platform, 
-    Text, 
-    Image, 
+    Text,  
     View, 
-    ActivityIndicator,
     Button 
 } from 'react-native'
 import { Avatar } from "react-native-elements";
-import { Icon } from 'react-native-vector-icons/FontAwesome'
 import Layout from '../constants/Layout'
 import { NavigationActions } from 'react-navigation';
 
@@ -39,22 +34,29 @@ export default class SubscriptionsScreen extends React.Component {
         this.setState({
             currentUser: userID,
             currentUsername: username
-        })
-        this.setUser(userID, username)
+        },
+        this.getUserSubscriptions(userID)
+        )
+        
+        // this.setUser(userID, username)
     }
 
-      setUser = (userID, username) => {
-        const setHomeParams = NavigationActions.setParams({
-            params: { 
-              user_id: userID,
-              username: username 
-            },
-            key: 'Home'
-        });
-          this.props.navigation.dispatch(setHomeParams);
-      }
+    getUserSubscriptions = () => {
+        
+    }
 
-      submitServices = () => {
+    //   setUser = (userID, username) => {
+    //     const setHomeParams = NavigationActions.setParams({
+    //         params: { 
+    //           user_id: userID,
+    //           username: username 
+    //         },
+    //         key: 'Home'
+    //     });
+    //       this.props.navigation.dispatch(setHomeParams);
+    //   }
+
+      saveServices = () => {
         fetch('http://localhost:3001/api/v1/subscriptions/', {
           method: 'POST',
           headers: {
@@ -106,9 +108,6 @@ export default class SubscriptionsScreen extends React.Component {
                     <View style={styles.rowContainer}>
                         <Avatar
                             rounded
-                            title="amazon"
-                            value="amazon"
-                            raised
                             containerStyle={styles.logoContainer}
                             size="large"
                             activeOpacity={0.2}
@@ -294,10 +293,10 @@ export default class SubscriptionsScreen extends React.Component {
                 </View>
                 <View style={styles.continueButton}>
                     <Button 
-                        title="Create Account!" 
+                        title="Save" 
                         type="clear" 
                         color="black" 
-                        onPress={() => this.submitServices()}/>
+                        onPress={() => this.saveServices()}/>
                 </View>
             </SafeAreaView>
         )

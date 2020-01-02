@@ -12,9 +12,9 @@ class InputField extends Component {
       inputType,
       customStyle,
     } = this.props;
-    const color = labelColor || 'black';
-    const fontSize = labelTextSize || 14;
-    const inputColor = textColor || 'black';
+    const color = labelColor || 'white';
+    const fontSize = labelTextSize || 16;
+    const inputColor = textColor || 'white';
     const borderBottom = borderBottomColor || "black";
     return (
         <View style={[customStyle, styles.wrapper]}>
@@ -42,7 +42,9 @@ class InputField extends Component {
   const styles = StyleSheet.create({
     wrapper: {
       display: "flex",
-      justifyContent: 'center'
+      justifyContent: 'center',
+      height: 50,
+      marginTop: 20,
     },
     label: { 
         fontWeight: "700", 

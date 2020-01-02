@@ -8,37 +8,49 @@ const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49
 export default function MoreInfoModal(props){
 
         return (
-            <AnimatedModal
-                visible={props.modalVisible}
-                animationType="slide"
-                duration={600}
-                >
-                <ScrollView 
-                    alwaysBounceVertical
-                     >
-                    <View style={styles.modalCard}>
-                        <Text style={styles.titleText}>{props.programInfo.Title}</Text>
-                        <Tile 
-                            imageSrc={{uri: props.moreInfoPoster}} 
-                            imageContainerStyle={styles.posterContainer}
-                            />
-                        <View style={styles.ratingsContainer}>
-                            <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
-                            <Text style={styles.modalText}> {props.imdbRating} </Text>
-                            <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
-                            <Text style={styles.modalText}> {props.tomatoesRating} </Text>
-                        </View>
-                        <View style={styles.programCredits}>
-                            <Text style={styles.modalText}> Genre: {props.programInfo.Genre}</Text>
-                            <Text style={styles.modalText}> Release Date: {props.programInfo.Released}</Text>
-                            <Text style={styles.modalText}> Plot: {props.programInfo.Plot}</Text>
-                            <Text style={styles.modalText}> Cast: {props.programInfo.Actors}</Text>
-                            <Text style={styles.modalText}> Director: {props.programInfo.Director}</Text>
-                            <Text style={styles.modalText}> Writer: {props.programInfo.Writer}</Text>
-                        </View>
-                    </View>
-                </ScrollView>
-            </AnimatedModal>
+          <AnimatedModal
+          visible={this.state.modalVisible}
+          onBackdropPress={() => {
+            this.setState({ modalVisible: false });
+          }}
+          animationType="slide"
+          duration={600}
+          >
+          <ScrollView 
+            alwaysBounceVertical
+            >
+            <View style={styles.modalCard}>
+              <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
+              <Divider style={styles.divider}/>
+              <Tile 
+                imageSrc={{uri: this.state.moreInfoPoster}} 
+                imageContainerStyle={styles.posterContainer}
+                />
+              <View style={styles.ratingsContainer}>
+                <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
+                {this.state.imdbRating ?
+                <Text style={styles.modalText}> {this.state.imdbRating} </Text>
+                :
+                <Text style={styles.ratingsText}> N/A </Text>
+                }
+                <Image style={styles.ratingsLogos} source={require('../assets/images/rotten-tomatoes-logo.png')}/>
+                {this.state.tomatoesRating ?
+                <Text style={styles.ratingsText}> {this.state.tomatoesRating} </Text>
+                :
+                <Text style={styles.modalText}> N/A </Text>
+                }
+              </View>
+              <View style={styles.programCredits}>
+                <Text style={styles.modalText}> Genre: {this.state.programInfo.Genre}</Text>
+                <Text style={styles.modalText}> Release Date: {this.state.programInfo.Released}</Text>
+                <Text style={styles.modalText}> Plot: {this.state.programInfo.Plot}</Text>
+                <Text style={styles.modalText}> Cast: {this.state.programInfo.Actors}</Text>
+                <Text style={styles.modalText}> Director: {this.state.programInfo.Director}</Text>
+                <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
+              </View>
+            </View>
+          </ScrollView>
+        </AnimatedModal>
         )
     
 }
@@ -89,5 +101,6 @@ const styles = StyleSheet.create({
         height: 30,
         width: 30,
       },
+      
 
 })
