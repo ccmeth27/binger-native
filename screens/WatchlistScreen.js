@@ -15,6 +15,7 @@ import ToggleSwitch from '../components/ToggleSwitch'
 import Layout from '../constants/Layout'
 import { Tile, Button } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import WatchlistFlatList from '../components/WatchlistFlatList'
 
 class WatchlistScreen extends React.Component {
   
@@ -281,15 +282,16 @@ class WatchlistScreen extends React.Component {
               <ActivityIndicator size="large" color="#0000ff"/>
             </View>
             :
-            <View style={styles.flatlistContainer}>
-              <FlatList
-                  data={this.state.allUserPrograms}
-                  renderItem={({ item }) => this.renderItem(item)}
-                  keyExtractor={item => item.id}
-                  numColumns={2}
-                  on
-              />
-            </View>
+            <WatchlistFlatList allUserPrograms={this.state.allUserPrograms} renderItem={this.renderItem}/>
+            // <View style={styles.flatlistContainer}>
+            //   <FlatList
+            //       data={this.state.allUserPrograms}
+            //       renderItem={({ item }) => this.renderItem(item)}
+            //       keyExtractor={item => item.id}
+            //       numColumns={2}
+            //       on
+            //   />
+            // </View>
             }
           
         </SafeAreaView>

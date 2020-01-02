@@ -42,16 +42,16 @@ class HomeScreen extends React.Component {
     fetch(`http://localhost:3001/api/v1/user_programs/${userID}`)
     .then(resp => resp.json())
     .then(userSwiped => {
-      console.log(userSwiped)
+      // console.log(userSwiped)
       this.setState({
         previouslySwiped: userSwiped.user_programs
       },
-      this.fetchMovies()
+      this.fetchPrograms()
       )
     })
   }
 
-  fetchMovies() {
+  fetchPrograms() {
     let type = this.state.programType
       fetch(`http://api-public.guidebox.com/v2/${type}?api_key=b0ca45b98b8a26cc9bb30019569448b2daa0090f&limit=50`)
       .then(resp => resp.json())

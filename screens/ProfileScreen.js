@@ -259,24 +259,24 @@ class ProfileScreen extends React.Component {
     const username = this.props.navigation.state.params.username
     return (
       <SafeAreaView style={styles.container}>
-                <Text style={styles.usernameText}>{username}</Text>
-                <Text style={styles.categoryText}>Edit Subscriptions</Text>
-                <Text style={styles.subHeader}>Please select the services you subscribe to:</Text>
-                {this.state.loading ?
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#0000ff"/>
-                </View>
-                :
-                this.renderStreamingIcons()
-                }
-                <View style={styles.saveButton}>
-                    <Button 
-                        title="Save" 
-                        type="clear" 
-                        color="black" 
-                        onPress={() => this.saveServices()}/>
-                </View>
-            </SafeAreaView>
+        <Text style={styles.usernameText}>{username}</Text>
+        <Text style={styles.categoryText}>Edit Subscriptions</Text>
+        <Text style={styles.subHeader}>Please select the services you subscribe to:</Text>
+        {this.state.loading ?
+        <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0000ff"/>
+        </View>
+        :
+        this.renderStreamingIcons()
+        }
+        <View style={styles.saveButton}>
+            <Button 
+                title="Save" 
+                type="clear" 
+                color="black" 
+                onPress={() => this.saveServices()}/>
+        </View>
+      </SafeAreaView>
     )
   }
   
@@ -296,8 +296,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginLeft: 10,
-    marginVertical: 10,
+    marginTop: 50,
     color: 'white',
+    alignSelf: 'center'
   },
   subscriptionsContainer: {
     height: 500,
@@ -320,8 +321,9 @@ const styles = StyleSheet.create({
   subHeader: {
       marginHorizontal: 40,
       fontSize: 20,
-      marginTop: 40,
-      alignSelf: 'center'
+      marginTop: 20,
+      alignSelf: 'center',
+      color: "white",
 
   },
   continueButton: {

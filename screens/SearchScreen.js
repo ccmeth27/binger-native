@@ -13,10 +13,9 @@ import {
 import { SearchBar, Button } from 'react-native-elements';
 import SearchCard from '../components/SearchCard'
 import ToggleSwitch from '../components/ToggleSwitch'
+import BrowseFlatList from '../components/BrowseFlatList'
 import Layout from '../constants/Layout'
-// import MoreInfoModal from '../components/MoreInfoModal'
 import Icon from 'react-native-vector-icons/FontAwesome'
-// import { AnimatedModal } from "react-native-modal-animated"
 import { Tile } from 'react-native-elements'
 const BOTTOM_BAR_HEIGHT = !Platform.isPad ? 29 : 49
 
@@ -24,10 +23,14 @@ class SearchScreen extends React.Component {
   
     state = {
         search: '',
-        loading: false,
+        loading: true,
         searchResults: [],
+        mostPopular: [],
+        isEmpty: true,
+        isDone: false,
         page: 1,
         programType: 'movie',
+        guideboxType: 'movies',
         switch1Value: false,
         modalVisible: false,
         programInfo: [],
@@ -43,6 +46,24 @@ class SearchScreen extends React.Component {
             loading: true
         })
     };
+    componentDidMount(){
+        this.fetchMostPopular()
+    }
+
+    fetchMostPopular() {
+        let type = this.state.guideboxType
+          fetch(`http://api-public.guidebox.com/v2/${type}?api_key=b0ca45b98b8a26cc9bb30019569448b2daa0090f&limit=50`)
+          .then(resp => resp.json())
+          .then(popularPrograms => {
+              this.setState({
+              mostPopular: popularPrograms,
+              loading: false
+              })
+          })
+          .catch((error) => {
+              console.error(error);
+            });
+      }
 
     getSearchResults = () => {
         // console.log(this.state.switch1Value)
@@ -57,6 +78,7 @@ class SearchScreen extends React.Component {
             this.setState({
                 searchResults: results.Search,
                 loading: false,
+                isEmpty: false,
             })
 
         })
@@ -68,6 +90,7 @@ class SearchScreen extends React.Component {
             case true:
                 this.setState({
                     programType: 'series',
+                    guideboxType: 'shows',
                     switch1Value: value,
                     loading: true,
                     tomatoesRating: 'N/A',
@@ -78,9 +101,11 @@ class SearchScreen extends React.Component {
             case false:
                 this.setState({
                     programType: 'movie',
+                    guideboxType: 'movies',
                     switch1Value: value,
                     loading: true
                     },
+                    
                     this.getSearchResults
                 )
                 break;
@@ -201,6 +226,43 @@ class SearchScreen extends React.Component {
           console.log(error);
         })
     }
+
+    renderMostPopular = (item) => {
+        console.log(item)
+        
+        return (
+          <View>
+            <Tile
+              key={item.id}
+              onPress={() => console.log(item)}
+              iconContainerStyle={styles.icon}
+              imageSrc={{ uri: item.poster}}
+              imageContainerStyle={styles.posterImage}
+              activeOpacity={0.9}
+              caption={item.title}
+              captionStyle={styles.caption}
+              containerStyle={styles.tileContainer}
+              contentContainerStyle={{width: 200}}
+              overlayContainerStyle={styles.overlay}
+              featured
+              />
+              <View style={styles.editContainer}>
+                <Button
+                  type="clear"
+                  style={styles.editButton}
+                  onPress={() => this.openWatchlistModal(item)}
+                  icon={
+                  <Icon
+                      name="ellipsis-v"
+                      size={40}
+                      color="white"
+                  />
+                  }
+              />
+              </View> 
+          </View>
+        )
+      }
     
 
     render () {
@@ -229,28 +291,29 @@ class SearchScreen extends React.Component {
                 
                 />
             </View>
+            
             <View>
-            <Modal
-                animationType={'slide'}
-                transparent={false}
-                visible={this.state.modalVisible}
-            >
-          <View style={styles.modalContainer}>
-            <View >
-              <Button
-                buttonStyle={styles.closeButton}
-                type="clear"
-                onPress={() => this.setState({
-                  modalVisible: false
-                })}
-                title="Close"
-                />
-              </View>
-                  <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
-                  <Tile 
-                    imageSrc={{uri: this.state.moreInfoPoster}} 
-                    imageContainerStyle={styles.posterContainer}
-                    />
+                <Modal
+                    animationType={'slide'}
+                    transparent={false}
+                    visible={this.state.modalVisible}
+                >
+                <View style={styles.modalContainer}>
+                    <View >
+                    <Button
+                        buttonStyle={styles.closeButton}
+                        type="clear"
+                        onPress={() => this.setState({
+                        modalVisible: false
+                        })}
+                        title="Close"
+                        />
+                    </View>
+                        <Text style={styles.titleText}>{this.state.programInfo.Title}</Text>
+                        <Tile 
+                            imageSrc={{uri: this.state.moreInfoPoster}} 
+                            imageContainerStyle={styles.posterContainer}
+                            />
                   <View style={styles.ratingsContainer}>
                       <Image style={styles.ratingsLogos} source={require('../assets/images/imdb-logo.png') }/>
                       <Text style={styles.ratingsText}> {this.state.imdbRating} </Text>
@@ -294,23 +357,31 @@ class SearchScreen extends React.Component {
                 </View>
               </Modal>
             </View>
-            {this.state.loading ?
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#0000ff"/>
-            </View>
-            :
-            <View>
-                <FlatList
-                    data={this.state.searchResults}
-                    renderItem={({item}) => this.renderItem(item)}
-                    keyExtractor={item => item.Poster}
-                    horizontal={true}
-                    
-                    />
-            </View>
-            }
-                
-        </SafeAreaView>
+                <View>
+                {this.state.loading ?
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color="#0000ff"/>
+                    </View>
+                    :
+                    <View>
+                        {this.state.isEmpty && this.state.isDone ?
+                        <BrowseFlatList mostPopular={this.state.mostPopular} renderMostPopular={this.renderMostPopular}/>
+                        :
+                        <View>
+                            <FlatList
+                                data={this.state.searchResults}
+                                renderItem={({item}) => this.renderItem(item)}
+                                keyExtractor={item => item.Poster}
+                                horizontal={true}
+                                
+                                />
+                        </View>
+                        }
+                        
+                    </View>
+                    }
+                </View>
+    </SafeAreaView>
         )
     }
   
