@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import ToggleSwitch from '../components/ToggleSwitch'
 import Layout from '../constants/Layout'
-import { Tile, Button } from 'react-native-elements'
+import { Tile, Button, Overlay, Tooltip } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import WatchlistFlatList from '../components/WatchlistFlatList'
 
@@ -26,6 +26,8 @@ class WatchlistScreen extends React.Component {
     switch1Value: false,
     modalVisible: false,
     modal2Visible: false,
+    overlayVisible: false,
+    overlayText:'',
     programInfo: [],
     moreInfoPoster: '../assets/images/what.gif',
     releaseYear: '',
@@ -165,6 +167,10 @@ class WatchlistScreen extends React.Component {
     .then(resp => resp.json())
     .then(data => {
         console.log(data)
+        this.setState({
+          overlayText: 'Added to Watchlist',
+          overlayVisible: true,
+        })
     })
     .catch((error) => {
       console.log(error);
@@ -205,6 +211,20 @@ class WatchlistScreen extends React.Component {
       return (
         <SafeAreaView style={{ flex: 1}} >
             <View style={styles.mainContainer}>
+            {/* <Overlay
+                isVisible={this.state.overlayVisible}
+                windowBackgroundColor="rgba(255, 255, 255, .5)"
+                overlayBackgroundColor="red"
+                width="auto"
+                height="auto"
+                onBackdropPress={() => 
+                  this.setState({ overlayVisible: false })
+                }
+              >
+                <View>
+                  <Text>{this.state.overlayText}</Text>
+                </View>
+              </Overlay> */}
               <Modal
                 animationType={'slide'}
                 transparent={false}
@@ -241,18 +261,20 @@ class WatchlistScreen extends React.Component {
                       <Text style={styles.modalText}> Writer: {this.state.programInfo.Writer}</Text>
                   </View>
                   <View style={styles.buttonsContainer}>
-                    <Button
-                        type="clear"
-                        style={styles.rejectButton}
-                        onPress={() => this.addToRejectedList()}
-                        icon={
-                        <Icon
-                            name="trash"
-                            size={35}
-                            color="red"
-                        />
-                      }
-                    />
+                    <Tooltip popover={<Text>Removed from you Watchlist!</Text>}>
+                      <Button
+                          type="clear"
+                          style={styles.rejectButton}
+                          onPress={() => this.addToRejectedList()}
+                          icon={
+                          <Icon
+                              name="trash"
+                              size={35}
+                              color="red"
+                          />
+                        }
+                      />
+                      </Tooltip>
                     <Button
                         type="clear"
                         style={styles.seenButton}

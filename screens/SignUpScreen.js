@@ -1,5 +1,5 @@
 import React from 'react'
-import { SafeAreaView, Button, View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { SafeAreaView, Button, View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import InputField from '../components/InputField'
 // import { Button } from 'react-native-elements'
 // import Icon from 'react-native-vector-icons/FontAwesome'
@@ -62,6 +62,9 @@ export default class SignUpScreen extends React.Component {
     render() {
       return (
         <SafeAreaView style={styles.container}>
+          <Image 
+            source={require('../assets/images/binger.png')}
+            style={styles.logo}/>
           <Text style={styles.registerHeader}>Sign Up</Text>
           <InputField 
             name="username" 
@@ -115,7 +118,7 @@ export default class SignUpScreen extends React.Component {
       alignSelf: 'center',
       marginHorizontal: 20,
       marginVertical: 20,
-      marginTop: 40,
+      marginTop: 20,
       color: 'white'
     },
     container: {
@@ -124,11 +127,10 @@ export default class SignUpScreen extends React.Component {
       backgroundColor: '#121212',
     },
     registerHeader: {
-      fontSize: 28,
+      fontSize: 22,
       color: 'white',
       fontWeight: "bold",
-      marginBottom: 50,
-      top: 20,
+      marginTop: 30,
       alignSelf: 'center'
     },
     continueButton: {
@@ -143,11 +145,17 @@ export default class SignUpScreen extends React.Component {
     },
     signInButton: {
       padding: 10,
-      marginTop: 30,
+      marginTop: 10,
       borderRadius: 25,
       backgroundColor: '#0097FA',
       width: 200,
       alignSelf: 'center',
       justifyContent: 'flex-end'
+    },
+    logo: { 
+      width: 200, 
+      height: 100,
+      alignSelf: 'center',
+      marginTop: 10,
     }
   });
