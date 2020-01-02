@@ -419,9 +419,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     alignSelf: 'center',
-    fontSize: 30,
+    fontSize: 24,
     marginHorizontal: 20,
-    // top: 10,
   },
   ratingsText: {
     color: 'white',

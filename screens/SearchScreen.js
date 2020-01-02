@@ -23,7 +23,7 @@ class SearchScreen extends React.Component {
   
     state = {
         search: '',
-        loading: true,
+        loading: false,
         searchResults: [],
         mostPopular: [],
         isEmpty: true,
@@ -40,9 +40,9 @@ class SearchScreen extends React.Component {
     };
 
     updateSearch = text => {
-        // console.log(text)
         this.setState({
             search: text,
+            isEmpty: false,
             loading: true
         })
     };
@@ -64,17 +64,23 @@ class SearchScreen extends React.Component {
               console.error(error);
             });
       }
+    
+    submitSearch = () => {
+        this.setState({
+            isEmpty: false,
+            loading: true,
+        },
+        this.getSearchResults()
+        )
+    }
 
     getSearchResults = () => {
-        // console.log(this.state.switch1Value)
-        // console.log(this.state.programType)
         let type = this.state.programType
         let input = this.state.search
         let page = this.state.page
         fetch(`http://www.omdbapi.com/?s=${input}&type=${type}&apikey=6743b2b0`)
         .then(resp => resp.json())
         .then(results => {
-            // console.log(results.Search)
             this.setState({
                 searchResults: results.Search,
                 loading: false,
@@ -286,7 +292,7 @@ class SearchScreen extends React.Component {
                     containerStyle={styles.searchContainer}
                     keyboardAppearance="dark"
                     round={true}
-                    onSubmitEditing={this.getSearchResults}
+                    onSubmitEditing={this.submitSearch}
                     autoFocus={true}
                 
                 />
@@ -364,9 +370,9 @@ class SearchScreen extends React.Component {
                     </View>
                     :
                     <View>
-                        {/* {this.state.isEmpty && this.state.isDone ?
-                        <BrowseFlatList mostPopular={this.state.mostPopular} renderMostPopular={this.renderMostPopular}/>
-                        :} */}
+                        {this.state.isEmpty ?
+                        <Text style={styles.waiting}>Enter three or more characters before submitting</Text>
+                        :
                         <View>
                             <FlatList
                                 data={this.state.searchResults}
@@ -376,6 +382,7 @@ class SearchScreen extends React.Component {
                                 
                                 />
                         </View>
+                        }
                         
                         
                     </View>
@@ -473,7 +480,7 @@ const styles = StyleSheet.create({
        color: 'white',
        fontWeight: 'bold',
        alignSelf: 'center',
-       fontSize: 30,
+       fontSize: 20,
        marginHorizontal: 20,
     },
      divider: {
@@ -486,7 +493,6 @@ const styles = StyleSheet.create({
     },
     ratingsLogos: {
        alignSelf: 'center',
-       justifyContent: 'center',
        height: 30,
        width: 30,
     },
@@ -499,7 +505,7 @@ const styles = StyleSheet.create({
        top:20,
     },
     buttonsContainer: {
-       marginTop: 25,
+       marginTop: 20,
        width: Layout.window.width
     },
     addButton: {
@@ -522,5 +528,12 @@ const styles = StyleSheet.create({
     ratingsContainer: {
        flexDirection: 'row',
        alignSelf: 'center',
+    },
+    waiting: {
+        color: "white",
+        fontSize: 18,
+        alignSelf: 'center',
+        marginTop: 20,
+
     },
 })
