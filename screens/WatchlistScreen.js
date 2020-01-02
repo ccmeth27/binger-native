@@ -28,7 +28,7 @@ class WatchlistScreen extends React.Component {
     releaseYear: '',
     imdbRating: 'N/A',
     tomatoesRating: 'N/A',
-    imdb_id: '',
+    imdbID: '',
   }
   componentDidMount = () => {
     this.fetchUserWatchlist()
@@ -127,7 +127,7 @@ class WatchlistScreen extends React.Component {
                 moreInfoPoster: programData.Poster,
                 imdbRating: programData.Ratings[0].Value, 
                 tomatoesRating: programData.Ratings[1].Value, 
-                imdb_id: imdb,
+                imdbID: imdb,
                 
             })
         }else{
@@ -137,7 +137,7 @@ class WatchlistScreen extends React.Component {
                 moreInfoPoster: programData.Poster,
                 imdbRating: 'N/A', 
                 tomatoesRating: 'N/A',
-                imdb_id: imdb,
+                imdbID: imdb,
             })
           }
       })
@@ -145,13 +145,7 @@ class WatchlistScreen extends React.Component {
 
   addToSeenList = () => {
     const userID = this.props.navigation.state.params.user_id
-    let type;
-    if(this.state.programType === 'movie'){
-      type = 1
-    }else{
-      type = 0
-    }
-    fetch('http://localhost:3001/api/v1/user_programs', {
+    fetch(`http://localhost:3001/api/v1/watched_program/${userID}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -159,15 +153,9 @@ class WatchlistScreen extends React.Component {
       },
       body: JSON.stringify({
         user_id: userID,
-        guidebox_id: this.state.guideboxID,
-        is_seen: 1,
-        is_rejected: 0,
-        is_watchlist: 0,
-        title: this.state.programInfo.Title,
-        poster: this.state.moreInfoPoster,
-        release_year: this.state.programInfo.Released,
-        imdb: this.state.imdb_id,
-        is_movie: type
+        imdb_id: this.state.imdbID,
+        is_seen: true,
+        is_watchlist: false,
       })
     })
     .then(resp => resp.json())
@@ -181,13 +169,7 @@ class WatchlistScreen extends React.Component {
   }
   addToRejectedList = () => {
     const userID = this.props.navigation.state.params.user_id
-    let type;
-    if(this.state.programType === 'movie'){
-      type = 1
-    }else{
-      type = 0
-    }
-    fetch('http://localhost:3001/api/v1/user_programs', {
+    fetch(`http://localhost:3001/api/v1/remove_program/${userID}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -195,15 +177,9 @@ class WatchlistScreen extends React.Component {
       },
       body: JSON.stringify({
         user_id: userID,
-        guidebox_id: this.state.guideboxID,
-        is_seen: 0,
-        is_rejected: 1,
-        is_watchlist: 0,
-        title: this.state.programInfo.Title,
-        poster: this.state.moreInfoPoster,
-        release_year: this.state.programInfo.Released,
-        imdb: this.state.imdb_id,
-        is_movie: type
+        imdb_id: this.state.imdbID,
+        is_rejected: true,
+        is_watchlist: false,
       })
     })
     .then(resp => resp.json())
@@ -230,7 +206,6 @@ class WatchlistScreen extends React.Component {
                 <View style={styles.modalContainer}>
                   <View >
                     <Button
-                      // color="#000"
                       buttonStyle={styles.closeButton}
                       type="clear"
                       onPress={() => this.setState({
@@ -365,6 +340,11 @@ const styles = StyleSheet.create({
     bottom: 260,
     left: 75,
     // backgroundColor: ''
+  },
+  editbutton: {
+    backgroundColor: 'rgba(52, 52, 52, 0.7)',
+    height: 20,
+    width: 20,
   },
   buttonsContainer: {
     marginTop: 25,

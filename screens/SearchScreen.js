@@ -92,7 +92,7 @@ class SearchScreen extends React.Component {
         fetch(`http://www.omdbapi.com/?i=${imdb}&apikey=6743b2b0`)
         .then(resp => resp.json())
         .then(programData => {
-            console.log(programData)
+            // console.log(programData)
             if (this.state.programType === 'movie') {
                 this.setState({
                     modalVisible: true,
@@ -131,13 +131,13 @@ class SearchScreen extends React.Component {
         )
     }
 
-    addToWatchList = (item) => {
+    addToWatchList = () => {
         let userID = this.props.navigation.state.params.user_id
         let type;
-        if (item.Type === 'movie'){
-            type = 1
+        if (this.state.programInfo.Type === 'movie'){
+            type = true
         }else{
-            type = 0
+            type = false
         }
         fetch('http://localhost:3001/api/v1/user_programs', {
         method: 'POST',
@@ -147,14 +147,13 @@ class SearchScreen extends React.Component {
         },
         body: JSON.stringify({
             user_id: userID,
-            guidebox_id: 0,
-            is_seen: 0,
-            is_rejected: 0,
-            is_watchlist: 1,
-            title: item.Title,
-            poster: item.Poster,
-            release_year: item.Year,
-            imdb: item.imdbID,
+            is_seen: false,
+            is_rejected: false,
+            is_watchlist: true,
+            poster: this.state.programInfo.Poster,
+            title: this.state.programInfo.Title,
+            release_year: this.state.programInfo.Year,
+            imdb: this.state.programInfo.imdbID,
             is_movie: type,
         })
         })
@@ -167,42 +166,41 @@ class SearchScreen extends React.Component {
         })
     }
 
-    addToSeenList = (item) => {
-        let userID = this.props.navigation.state.params.user_id
+    addToSeenList = () => {
         let type;
-        if (item.Type === 'movie'){
-            type = 1
+        if (this.state.programInfo.Type === 'movie'){
+            type = true
         }else{
-            type = 0
+            type = false
         }
-        fetch('http://localhost:3001/api/v1/user_programs', {
-        method: 'POST',
-        headers: {
+        const userID = this.props.navigation.state.params.user_id
+        fetch(`http://localhost:3001/api/v1/watched_program/${userID}`, {
+          method: 'POST',
+          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+          },
+          body: JSON.stringify({
             user_id: userID,
-            guidebox_id: 0,
-            is_seen: 1,
-            is_rejected: 0,
-            is_watchlist: 0,
-            title: item.Title,
-            poster: item.Poster,
-            release_year: item.Year,
-            imdb: item.imdbID,
+            imdb_id: this.state.programInfo.imdbID,
+            is_seen: true,
+            is_watchlist: false,
+            is_rejected: false,
+            poster: this.state.programInfo.Poster,
+            title: this.state.programInfo.Title,
+            release_year: this.state.programInfo.Year,
+            imdb: this.state.programInfo.imdbID,
             is_movie: type,
-        })
+          })
         })
         .then(resp => resp.json())
         .then(data => {
             console.log(data)
         })
         .catch((error) => {
-        console.log(error);
+          console.log(error);
         })
     }
-
     
 
     render () {
@@ -240,7 +238,6 @@ class SearchScreen extends React.Component {
           <View style={styles.modalContainer}>
             <View >
               <Button
-                // color="#000"
                 buttonStyle={styles.closeButton}
                 type="clear"
                 onPress={() => this.setState({
@@ -272,7 +269,7 @@ class SearchScreen extends React.Component {
                     <Button
                           type="clear"
                           style={styles.seenButton}
-                          onPress={() => this.addToSeenList(item)}
+                          onPress={() => this.addToSeenList()}
                           icon={
                           <Icon
                               name="eye-slash"
@@ -284,7 +281,7 @@ class SearchScreen extends React.Component {
                     <Button
                         type="clear"
                         style={styles.addButton}
-                        onPress={() => this.addToWatchlist(item)}
+                        onPress={() => this.addToWatchList()}
                         icon={
                         <Icon
                             name="bookmark"
@@ -429,7 +426,6 @@ const styles = StyleSheet.create({
     closeButton: {
        height: 80,
        top:20,
-       color: 'white'
     },
     buttonsContainer: {
        marginTop: 25,
