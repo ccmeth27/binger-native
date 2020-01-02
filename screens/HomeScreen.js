@@ -443,7 +443,7 @@ class HomeScreen extends React.Component {
             onTapCardDeadZone={10}
             backgroundColor="#151515"
             cardHorizontalMargin={0}
-            stackSize={2}
+            stackSize={3}
             overlayLabels={{
               left: {
                 title: 'NOPE',

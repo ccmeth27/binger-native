@@ -29,7 +29,8 @@ class InputField extends Component {
             autoCapitalize={"none"}
             style={[
               { color: inputColor, 
-                borderBottomColor: borderBottom 
+                borderBottomColor: borderBottom,
+                height: 30, 
                 },
                 styles.input
             ]}
@@ -54,10 +55,9 @@ class InputField extends Component {
     },
     input: {
       borderBottomWidth: 1,
-      paddingTop: 5,
       marginBottom: 5,
-      marginLeft: 30,
-      marginRight: 30,
+      marginLeft: 40,
+      marginRight: 40,
     }
   });
   export default InputField;
