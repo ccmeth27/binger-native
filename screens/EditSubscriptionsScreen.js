@@ -4,7 +4,8 @@ import {
     StyleSheet, 
     Text,  
     View, 
-    Button 
+    Button,
+    ActivityIndicator, 
 } from 'react-native'
 import { Avatar } from "react-native-elements";
 import Layout from '../constants/Layout'
@@ -25,7 +26,8 @@ export default class SubscriptionsScreen extends React.Component {
         tntSelected: false,
         usaSelected: false,
         currentUser: null,
-        currentUsername: ''
+        currentUsername: '',
+        loading: true,
     }
 
     componentDidMount(){
@@ -42,7 +44,7 @@ export default class SubscriptionsScreen extends React.Component {
     }
 
     getUserSubscriptions = () => {
-        
+        fetch(`http://localhost:3001/api/v1/show_subscriptions/${userID}`)
     }
 
     //   setUser = (userID, username) => {
@@ -104,6 +106,11 @@ export default class SubscriptionsScreen extends React.Component {
             <SafeAreaView style={styles.container}>
                 <Text style={styles.header}>Subscriptions</Text>
                 <Text style={styles.subHeader}>Please select the services you subscribe to:</Text>
+                {this.state.loading ?
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#0000ff"/>
+                </View>
+                :
                 <View style={styles.subscriptionsContainer}>
                     <View style={styles.rowContainer}>
                         <Avatar
@@ -291,6 +298,7 @@ export default class SubscriptionsScreen extends React.Component {
                             />
                     </View>
                 </View>
+                }
                 <View style={styles.continueButton}>
                     <Button 
                         title="Save" 
@@ -298,6 +306,7 @@ export default class SubscriptionsScreen extends React.Component {
                         color="black" 
                         onPress={() => this.saveServices()}/>
                 </View>
+      
             </SafeAreaView>
         )
       }

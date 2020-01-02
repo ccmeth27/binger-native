@@ -346,7 +346,6 @@ class HomeScreen extends React.Component {
           <View style={styles.modalContainer}>
             <View >
               <Button
-                // color="#000"
                 buttonStyle={styles.closeButton}
                 type="clear"
                 onPress={() => this.setState({

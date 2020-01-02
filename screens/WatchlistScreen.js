@@ -7,6 +7,8 @@ import {
   Image, 
   View, 
   StyleSheet,
+  ScrollView,
+  RefreshControl,
   Modal
 } from 'react-native'
 import ToggleSwitch from '../components/ToggleSwitch'
@@ -79,6 +81,7 @@ class WatchlistScreen extends React.Component {
 
   renderItem = (item) => {
     console.log(item)
+    
     return (
       <View>
         <Tile
@@ -192,7 +195,10 @@ class WatchlistScreen extends React.Component {
   
   }
 
+  
+
   render() {
+    
     const userID = this.props.navigation.state.params.user_id
     console.log(userID)
       return (
@@ -292,6 +298,8 @@ class WatchlistScreen extends React.Component {
 }
 
 export default WatchlistScreen
+
+
 
 const styles = StyleSheet.create({
   header: {
